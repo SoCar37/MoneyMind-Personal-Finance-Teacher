@@ -1,0 +1,2595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoneyMind v1.3 — Your Financial Journey</title>
+<meta name="version" content="1.3">
+<!-- © 2026 Burle Warren. All Rights Reserved. -->
+<!-- MoneyMind v1.3 -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf8f2;
+    --warm-white: #fff9f4;
+    --sage: #7fb083;
+    --sage-light: #a8c5ab;
+    --sage-dark: #5a8a5e;
+    --peach: #f4a26a;
+    --peach-light: #f9c9a5;
+    --peach-dark: #e07d3a;
+    --sky: #7ab8d4;
+    --sky-light: #b3d8e8;
+    --lavender: #b09ec9;
+    --lavender-light: #d4caeb;
+    --coral: #e8796a;
+    --gold: #e8c547;
+    --text-dark: #2d2a26;
+    --text-mid: #5a5650;
+    --text-light: #8a847e;
+    --card-shadow: 0 4px 24px rgba(45,42,38,0.08);
+    --card-shadow-hover: 0 8px 40px rgba(45,42,38,0.14);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { overscroll-behavior: none; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+  }
+
+  /* ===== SPLASH SCREEN ===== */
+  #splash {
+    position: fixed; inset: 0;
+    background: linear-gradient(145deg, #fdf0e4 0%, #e8f4ea 50%, #e4eef8 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  #splash.hidden { opacity: 0; pointer-events: none; transform: scale(1.04); }
+
+  .splash-logo {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--peach) 100%);
+    border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px;
+    box-shadow: 0 12px 40px rgba(127,176,131,0.35);
+    margin-bottom: 24px;
+    animation: logoFloat 2s ease-in-out infinite alternate;
+  }
+  @keyframes logoFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+  }
+
+  .splash-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 42px; font-weight: 900;
+    color: var(--text-dark);
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .splash-sub {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    color: var(--text-mid);
+    font-size: 17px;
+    margin-bottom: 48px;
+  }
+  .name-input {
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 20px;
+    border-radius: 50px;
+    border: 2px solid var(--sage-light);
+    background: white;
+    color: var(--text-dark);
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 12px rgba(90,138,94,0.15);
+    box-sizing: border-box;
+  }
+  .name-input::placeholder { color: var(--text-light); }
+  .name-input:focus { border-color: var(--sage); box-shadow: 0 2px 16px rgba(90,138,94,0.25); }
+  .splash-btn {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    color: white;
+    border: none;
+    padding: 18px 48px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px; font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(90,138,94,0.35);
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+  .splash-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(90,138,94,0.45); }
+  .splash-btn:active { transform: translateY(0); }
+
+  /* ===== MAIN APP ===== */
+  #app { display: none; flex-direction: column; min-height: 100vh; }
+  #app.visible { display: flex; }
+
+  /* ===== TOP NAV ===== */
+  .topnav {
+    background: var(--warm-white);
+    border-bottom: 2px solid rgba(127,176,131,0.15);
+    padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 16px rgba(45,42,38,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .nav-logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--peach) 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .nav-logo-text { font-size: 22px; font-weight: 900; color: var(--text-dark); letter-spacing: -0.5px; }
+  .nav-xp {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #fff4e8, #fff);
+    border: 2px solid var(--peach-light);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 14px; font-weight: 700; color: var(--peach-dark);
+  }
+  .nav-version {
+    font-size: 10px; font-weight: 700; color: var(--text-light);
+    letter-spacing: 0.5px; margin-left: 4px;
+  }
+  .app-footer {
+    text-align: center;
+    padding: 12px 16px 6px;
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .save-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text-dark); color: white;
+    padding: 8px 18px; border-radius: 50px;
+    font-size: 13px; font-weight: 700;
+    opacity: 0; transition: all 0.3s ease;
+    z-index: 200; white-space: nowrap;
+    pointer-events: none;
+  }
+  .save-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .reset-btn {
+    background: none; border: 2px solid #e8e4df;
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-light); cursor: pointer;
+    transition: all 0.2s; width: 100%; margin-top: 8px;
+  }
+  .reset-btn:hover { border-color: var(--coral); color: var(--coral); }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--warm-white);
+    border-top: 2px solid rgba(127,176,131,0.15);
+    display: flex;
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(45,42,38,0.08);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px 4px;
+    cursor: pointer; border: none; background: none;
+    transition: all 0.2s;
+    color: var(--text-light);
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; font-weight: 700;
+    gap: 4px;
+  }
+  .nav-item .nav-icon { font-size: 22px; transition: transform 0.2s; }
+  .nav-item.active { color: var(--sage-dark); }
+  .nav-item.active .nav-icon { transform: scale(1.15); }
+  .nav-item:hover { color: var(--sage); }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    flex: 1;
+    padding: 20px 16px 100px;
+    max-width: 680px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HOME SCREEN ===== */
+  .greeting-card {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    border-radius: var(--radius);
+    padding: 24px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .greeting-card::before {
+    content: '💰';
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    font-size: 64px; opacity: 0.2;
+  }
+  .greeting-name { font-size: 13px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .greeting-msg { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 16px; }
+  .progress-label { font-size: 12px; font-weight: 700; opacity: 0.85; margin-bottom: 8px; }
+  .progress-bar-bg {
+    background: rgba(255,255,255,0.25);
+    border-radius: 50px; height: 10px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: white;
+    border-radius: 50px; height: 100%;
+    transition: width 1s ease;
+  }
+  .progress-info { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.85; margin-top: 6px; font-weight: 700; }
+
+  .section-title {
+    font-size: 19px; font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 14px; margin-top: 24px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ===== MODULE CARDS ===== */
+  .module-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .module-card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+  .module-card.locked { opacity: 0.55; cursor: not-allowed; }
+  .module-card.locked:hover { transform: none; box-shadow: var(--card-shadow); }
+  .module-card.completed { border-color: var(--sage-light); background: linear-gradient(135deg, #f7fcf7, white); }
+  .module-card.active-module { border-color: var(--peach); }
+
+  .module-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+  }
+  .icon-sage { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+  .icon-peach { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+  .icon-sky { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+  .icon-lavender { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+  .icon-coral { background: linear-gradient(135deg, #fce4ec, #f8bbd0); }
+  .icon-gold { background: linear-gradient(135deg, #fffde7, #fff9c4); }
+
+  .module-info { flex: 1; min-width: 0; }
+  .module-layer { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); margin-bottom: 3px; }
+  .module-position {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-left: 2px;
+  }
+  .locked .module-position {
+    opacity: 0.5;
+  }
+  .module-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
+  .module-desc { font-size: 13px; color: var(--text-mid); line-height: 1.4; }
+  .module-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .module-time { font-size: 12px; color: var(--text-light); font-weight: 600; }
+  .module-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 50px;
+  }
+  .badge-required { background: #fff0e6; color: var(--peach-dark); }
+  .badge-unlocked { background: #e8f5e9; color: var(--sage-dark); }
+  .badge-locked { background: #f0f0f0; color: var(--text-light); }
+  .badge-done { background: #e8f5e9; color: var(--sage-dark); }
+
+  .module-status { font-size: 22px; flex-shrink: 0; }
+
+  /* ===== LESSON SCREEN ===== */
+  .lesson-header {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    margin-top: 0;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .lesson-back {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--sage-dark); font-weight: 700; font-size: 14px;
+    cursor: pointer; margin-bottom: 16px;
+    background: none; border: none; font-family: 'Nunito', sans-serif;
+    padding: 0;
+  }
+  .lesson-back:hover { color: var(--sage); }
+  .lesson-layer-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 50px;
+    margin-bottom: 10px;
+  }
+  .lesson-title { font-size: 24px; font-weight: 900; color: var(--text-dark); line-height: 1.2; margin-bottom: 8px; }
+  .lesson-subtitle { font-family: 'Lora', serif; font-style: italic; color: var(--text-mid); font-size: 15px; }
+
+  .lesson-progress-bar {
+    background: #f0f0f0; border-radius: 50px; height: 6px;
+    margin-top: 16px; overflow: hidden;
+  }
+  .lesson-progress-fill {
+    height: 100%; border-radius: 50px;
+    background: linear-gradient(90deg, var(--sage), var(--sage-dark));
+    transition: width 0.5s ease;
+  }
+
+  .lesson-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+    line-height: 1.7;
+  }
+  .lesson-card h3 {
+    font-size: 18px; font-weight: 800;
+    color: var(--text-dark); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .lesson-card p { color: var(--text-mid); font-size: 15px; margin-bottom: 12px; }
+  .lesson-card p:last-child { margin-bottom: 0; }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+    border-left: 4px solid var(--sage);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .highlight-box.peach {
+    background: linear-gradient(135deg, #fff3e0, #fff8e8);
+    border-left-color: var(--peach);
+  }
+  .highlight-box.coral {
+    background: linear-gradient(135deg, #fce4ec, #ffeef3);
+    border-left-color: var(--coral);
+  }
+  .highlight-box p { margin: 0; font-weight: 600; font-size: 14px; color: var(--text-dark); }
+
+  .quiz-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .quiz-q { font-size: 17px; font-weight: 800; color: var(--text-dark); margin-bottom: 18px; line-height: 1.4; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-option {
+    background: #f8f6f3;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--text-dark);
+    text-align: left;
+    transition: all 0.2s;
+  }
+  .quiz-option:hover { border-color: var(--sage-light); background: #f0f7f0; }
+  .quiz-option.correct { border-color: var(--sage); background: #e8f5e9; color: var(--sage-dark); }
+  .quiz-option.wrong { border-color: var(--coral); background: #fce4ec; color: #c0392b; }
+  .quiz-feedback {
+    margin-top: 14px; padding: 14px; border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #e8f5e9; color: var(--sage-dark); }
+  .quiz-feedback.wrong { background: #fce4ec; color: #c0392b; }
+
+  /* ===== CALCULATOR ===== */
+  .calc-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .calc-title { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .calc-desc { font-size: 14px; color: var(--text-mid); margin-bottom: 20px; }
+  .calc-row { margin-bottom: 16px; }
+  .calc-label { font-size: 13px; font-weight: 700; color: var(--text-mid); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+  .calc-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e8e4df;
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--text-dark);
+    background: #f8f6f3;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .calc-input:focus { border-color: var(--sage); background: white; }
+  .calc-result {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    color: white;
+    margin-top: 16px;
+    display: none;
+  }
+  .calc-result.show { display: block; }
+  .calc-result-label { font-size: 12px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .calc-result-value { font-size: 32px; font-weight: 900; margin-bottom: 4px; }
+  .calc-result-note { font-size: 13px; opacity: 0.85; line-height: 1.5; }
+  .calc-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--peach) 0%, var(--peach-dark) 100%);
+    color: white; border: none;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 12px;
+  }
+  .calc-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(224,125,58,0.35); }
+
+  /* ===== SCENARIO CARD ===== */
+  .scenario-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .scenario-story {
+    background: linear-gradient(135deg, #f8f4ff, #f0ebff);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 20px;
+    font-family: 'Lora', serif;
+    font-size: 15px; line-height: 1.7;
+    color: var(--text-dark);
+    border-left: 4px solid var(--lavender);
+  }
+  .scenario-q { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 14px; }
+  .scenario-options { display: flex; flex-direction: column; gap: 10px; }
+  .scenario-option {
+    background: #f8f6f3;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--text-dark); text-align: left;
+    transition: all 0.2s;
+  }
+  .scenario-option:hover { border-color: var(--lavender-light); background: #f3efff; }
+  .scenario-option.selected-best { border-color: var(--sage); background: #e8f5e9; }
+  .scenario-option.selected-ok { border-color: var(--gold); background: #fffde7; }
+  .scenario-option.selected-bad { border-color: var(--coral); background: #fce4ec; }
+  .scenario-result { margin-top: 16px; padding: 16px; border-radius: var(--radius-sm); display: none; font-size: 14px; line-height: 1.6; }
+  .scenario-result.show { display: block; }
+
+  /* ===== CHECKIN ===== */
+  .checkin-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .checkin-q { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; line-height: 1.4; }
+  .checkin-sub { font-size: 13px; color: var(--text-light); margin-bottom: 18px; }
+  .checkin-btns { display: flex; gap: 12px; }
+  .checkin-btn {
+    flex: 1; padding: 16px;
+    border: 2px solid #e8e4df;
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+    background: #f8f6f3; color: var(--text-mid);
+  }
+  .checkin-btn:hover { border-color: var(--sage-light); }
+  .checkin-btn.yes:hover, .checkin-btn.yes.selected { border-color: var(--sage); background: #e8f5e9; color: var(--sage-dark); }
+  .checkin-btn.no:hover, .checkin-btn.no.selected { border-color: var(--coral); background: #fce4ec; color: #c0392b; }
+  .checkin-response { margin-top: 14px; padding: 14px; border-radius: var(--radius-sm); font-size: 14px; display: none; font-weight: 600; line-height: 1.5; }
+  .checkin-response.show { display: block; }
+
+  /* ===== CONTINUE BUTTON ===== */
+  /* Lesson screen */
+  #screen-lesson { animation: none; }
+  #lesson-content { padding-bottom: 24px; }
+  #lesson-footer .continue-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    color: white; border: none;
+    padding: 18px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+    box-shadow: 0 4px 20px rgba(90,138,94,0.3);
+    display: block;
+  }
+  .continue-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    color: white; border: none;
+    padding: 18px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(90,138,94,0.3);
+  }
+  .continue-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(90,138,94,0.4); }
+  .complete-btn {
+    background: linear-gradient(135deg, var(--peach) 0%, var(--peach-dark) 100%);
+    box-shadow: 0 4px 20px rgba(224,125,58,0.3);
+  }
+  .complete-btn:hover { box-shadow: 0 8px 28px rgba(224,125,58,0.4); }
+
+  /* ===== PROGRESS SCREEN ===== */
+  .progress-screen-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat-box {
+    background: #f8f6f3;
+    border-radius: var(--radius-sm);
+    padding: 16px; text-align: center;
+  }
+  .stat-val { font-size: 32px; font-weight: 900; color: var(--text-dark); }
+  .stat-lbl { font-size: 12px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .layer-progress { margin-bottom: 20px; }
+  .layer-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .layer-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .layer-name { font-size: 14px; font-weight: 700; color: var(--text-dark); flex: 1; }
+  .layer-bar-bg { flex: 2; background: #f0f0f0; border-radius: 50px; height: 8px; overflow: hidden; }
+  .layer-bar-fill { height: 100%; border-radius: 50px; transition: width 1s ease; }
+  .layer-pct { font-size: 13px; font-weight: 700; color: var(--text-mid); min-width: 32px; text-align: right; }
+
+  .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .badge-item {
+    background: #f8f6f3;
+    border-radius: var(--radius-sm);
+    padding: 16px 12px; text-align: center;
+    transition: all 0.2s;
+  }
+  .badge-item.earned { background: linear-gradient(135deg, #fff9e6, #fff3cc); }
+  .badge-item.earned:hover { transform: translateY(-2px); }
+  .badge-emoji { font-size: 30px; margin-bottom: 6px; }
+  .badge-name { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+  .badge-item.earned .badge-name { color: var(--text-dark); }
+  .badge-locked-overlay { filter: grayscale(1); opacity: 0.4; }
+
+  /* ===== TIPS SCREEN ===== */
+  .tip-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--card-shadow);
+    border-left: 5px solid var(--sage);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tip-card:hover { transform: translateX(4px); }
+  .tip-card.peach { border-left-color: var(--peach); }
+  .tip-card.sky { border-left-color: var(--sky); }
+  .tip-card.lavender { border-left-color: var(--lavender); }
+  .tip-card.coral { border-left-color: var(--coral); }
+  .tip-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 6px; }
+  .tip-title { font-size: 16px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
+  .tip-preview { font-size: 14px; color: var(--text-mid); line-height: 1.5; }
+  .tip-body { font-size: 14px; color: var(--text-mid); line-height: 1.7; display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0ede8; }
+  .tip-body.open { display: block; }
+
+  /* ===== COMPLETION MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(45,42,38,0.5);
+    z-index: 500; display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 32px 24px; text-align: center;
+    max-width: 340px; width: 100%;
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modalPop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-emoji { font-size: 64px; margin-bottom: 16px; display: block; }
+  .modal-title { font-size: 24px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px; }
+  .modal-sub { font-size: 15px; color: var(--text-mid); margin-bottom: 8px; font-family: 'Lora', serif; font-style: italic; }
+  .modal-xp { font-size: 28px; font-weight: 900; color: var(--peach-dark); margin-bottom: 24px; }
+  .modal-btn {
+    background: linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%);
+    color: white; border: none;
+    padding: 16px 40px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-2px); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (min-width: 480px) {
+    .main-content { padding: 24px 24px 100px; }
+    .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (min-width: 680px) {
+    .topnav { padding: 0 32px; }
+    .main-content { padding: 32px 32px 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">🧠</div>
+  <div class="splash-title">MoneyMind</div>
+  <div class="splash-sub">Your personal finance journey starts here</div>
+  <button class="splash-btn" onclick="startApp()">Let's Begin →</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <div class="nav-logo" onclick="showScreen('home')">
+      <div class="nav-logo-icon">🧠</div>
+      <span class="nav-logo-text">MoneyMind</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="nav-version">v1.3</span>
+      <div class="nav-xp">⭐ <span id="xp-display">0</span> XP</div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen active">
+      <div class="greeting-card">
+        <div class="greeting-name" id="greeting-name">Welcome Back</div>
+        <div class="greeting-msg" id="greeting-msg">Ready to level up your money skills?</div>
+        <div class="progress-label">Overall Progress</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="overall-progress" style="width: 0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="modules-done">0 modules done</span>
+          <span id="modules-total"></span>
+        </div>
+      </div>
+
+      <div class="section-title">🔒 Required First</div>
+      <div id="required-modules"></div>
+
+      <div class="section-title">🚀 All Modules</div>
+      <div id="all-modules"></div>
+    </div>
+
+    <!-- LESSON SCREEN -->
+    <div id="screen-lesson" class="screen">
+      <div id="lesson-content"></div>
+      <div id="lesson-footer"></div>
+    </div>
+
+    <!-- PROGRESS SCREEN -->
+    <div id="screen-progress" class="screen">
+      <div class="section-title">📊 Your Progress</div>
+      <div class="progress-screen-card">
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-xp">0</div>
+            <div class="stat-lbl">Total XP</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-done">0</div>
+            <div class="stat-lbl">Completed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-streak">0🔥</div>
+            <div class="stat-lbl">Day Streak</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-pct">0%</div>
+            <div class="stat-lbl">Progress</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-screen-card">
+        <div class="section-title" style="margin-top:0">Layer Progress</div>
+        <div class="layer-progress">
+          <div class="layer-row">
+            <div class="layer-dot" style="background:var(--sage)"></div>
+            <div class="layer-name">Layer 1: Foundation</div>
+            <div class="layer-bar-bg"><div class="layer-bar-fill" id="l1-bar" style="width:0%;background:var(--sage)"></div></div>
+            <div class="layer-pct" id="l1-pct">0%</div>
+          </div>
+          <div class="layer-row">
+            <div class="layer-dot" style="background:var(--peach)"></div>
+            <div class="layer-name">Layer 2: Tools</div>
+            <div class="layer-bar-bg"><div class="layer-bar-fill" id="l2-bar" style="width:0%;background:var(--peach)"></div></div>
+            <div class="layer-pct" id="l2-pct">0%</div>
+          </div>
+          <div class="layer-row">
+            <div class="layer-dot" style="background:var(--sky)"></div>
+            <div class="layer-name">Layer 3: Deep Concepts</div>
+            <div class="layer-bar-bg"><div class="layer-bar-fill" id="l3-bar" style="width:0%;background:var(--sky)"></div></div>
+            <div class="layer-pct" id="l3-pct">0%</div>
+          </div>
+          <div class="layer-row">
+            <div class="layer-dot" style="background:var(--lavender)"></div>
+            <div class="layer-name">Layer 4: Scenarios</div>
+            <div class="layer-bar-bg"><div class="layer-bar-fill" id="l4-bar" style="width:0%;background:var(--lavender)"></div></div>
+            <div class="layer-pct" id="l4-pct">0%</div>
+          </div>
+          <div class="layer-row">
+            <div class="layer-dot" style="background:var(--coral)"></div>
+            <div class="layer-name">Layer 5: Reflection</div>
+            <div class="layer-bar-bg"><div class="layer-bar-fill" id="l5-bar" style="width:0%;background:var(--coral)"></div></div>
+            <div class="layer-pct" id="l5-pct">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-screen-card">
+        <div class="section-title" style="margin-top:0">🏅 Badges</div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+
+      <div class="progress-screen-card">
+        <div class="section-title" style="margin-top:0">⚙️ Settings</div>
+        <p style="font-size:14px;color:var(--text-mid);margin-bottom:12px">Reset all progress and start fresh. This cannot be undone.</p>
+        <button onclick="changeName()" style="background:none;border:1px solid var(--sage);color:var(--sage-dark);padding:8px 16px;border-radius:20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-right:8px">✏️ Change Name</button><button class="reset-btn" onclick="confirmReset()">🗑️ Reset All Progress</button>
+      </div>
+
+      <div class="app-footer">© 2026 Burle Warren. All Rights Reserved. · MoneyMind v1.3</div>
+    </div>
+
+    <!-- TIPS SCREEN -->
+    <div id="screen-tips" class="screen">
+      <div class="section-title">💡 Quick Tips</div>
+      <div id="tips-list"></div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="showScreen('home')" id="nav-home">
+      <span class="nav-icon">🏠</span>Home
+    </button>
+    <button class="nav-item" onclick="showScreen('progress')" id="nav-progress">
+      <span class="nav-icon">📊</span>Progress
+    </button>
+    <button class="nav-item" onclick="showScreen('tips')" id="nav-tips">
+      <span class="nav-icon">💡</span>Tips
+    </button>
+  </nav>
+<!-- Save Toast -->
+<div class="save-toast" id="save-toast">✓ Progress saved</div>
+
+</div><!-- /app -->
+
+<!-- Completion Modal -->
+<div class="modal-overlay" id="completion-modal">
+  <div class="modal-box">
+    <span class="modal-emoji" id="modal-emoji">🎉</span>
+    <div class="modal-title" id="modal-title">Module Complete!</div>
+    <div class="modal-sub" id="modal-sub">Great work keeping at it.</div>
+    <div class="modal-xp" id="modal-xp">+50 XP</div>
+    <button class="modal-btn" onclick="closeModal()">Keep Going →</button>
+  </div>
+</div>
+
+<script>
+// ===== LOCALSTORAGE KEY =====
+const STORAGE_KEY = 'moneymind_v1';
+
+// ===== APP STATE =====
+const state = {
+  xp: 0,
+  streak: 1,
+  lastVisit: null,
+  completedModules: new Set(),
+  currentModule: null,
+  currentStep: 0,
+  userName: '',
+};
+
+// ===== PERSISTENCE =====
+function saveState() {
+  try {
+    const data = {
+      xp: state.xp,
+      streak: state.streak,
+      lastVisit: new Date().toDateString(),
+      completedModules: [...state.completedModules],
+      userName: state.userName,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showToast('✓ Progress saved');
+  } catch(e) { /* storage unavailable */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    state.xp = data.xp || 0;
+    state.completedModules = new Set(data.completedModules || []);
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (data.lastVisit === today) {
+      state.streak = data.streak || 1;
+    } else if (data.lastVisit === yesterday) {
+      state.streak = (data.streak || 1) + 1;
+    } else if (data.lastVisit) {
+      state.streak = 1;
+    } else {
+      state.streak = 1;
+    }
+    state.lastVisit = data.lastVisit;
+    state.userName = data.userName || '';
+  } catch(e) { /* storage unavailable */ }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('save-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function changeName() {
+  const current = state.userName || '';
+  const name = prompt(`What should we call you?`, current);
+  if (name === null) return; // cancelled
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  state.userName = trimmed;
+  saveState();
+  renderHome();
+}
+
+function confirmReset() {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    state.xp = 0;
+    state.streak = 1;
+    state.completedModules = new Set();
+    state.currentModule = null;
+    state.currentStep = 0;
+    document.getElementById('xp-display').textContent = '0';
+    updateProgress();
+    renderHome();
+    showToast('\u2713 Progress reset');
+  }
+}
+
+// ===== MODULE DATA =====
+const modules = [
+  // LAYER 1: FOUNDATION (required, sequential)
+  {
+    id: 'l1m1', layer: 1, layerName: 'Foundation', required: true,
+    icon: '💸', iconClass: 'icon-sage',
+    title: 'Spending More Than You Earn',
+    desc: 'Why this one habit matters more than anything else.',
+    time: '5 min', xp: 50,
+    unlockAfter: null,
+    steps: ['intro','content1','quiz1','content2','content3','quiz2','realtalk','complete']
+  },
+  {
+    id: 'l1m2', layer: 1, layerName: 'Foundation', required: true,
+    icon: '📊', iconClass: 'icon-sage',
+    title: 'Gig Income Budgeting',
+    desc: 'How to budget when your paycheck changes every week.',
+    time: '7 min', xp: 60,
+    unlockAfter: 'l1m1',
+    steps: ['intro','content1','content2','quiz1','content3','quiz2','realtalk','complete']
+  },
+  {
+    id: 'l1m3', layer: 1, layerName: 'Foundation', required: true,
+    icon: '🔁', iconClass: 'icon-peach',
+    title: 'The Automatic Debit Trap',
+    desc: 'Know exactly what\'s leaving your account before you spend.',
+    time: '6 min', xp: 55,
+    unlockAfter: 'l1m2',
+    steps: ['intro','content1','quiz1','content2','content3','quiz2','realtalk','complete']
+  },
+  {
+    id: 'l1m4', layer: 1, layerName: 'Foundation', required: false,
+    icon: '💳', iconClass: 'icon-coral',
+    title: 'Credit Card Debt Reality',
+    desc: 'The real cost of carrying a balance — it\'ll surprise you.',
+    time: '8 min', xp: 65,
+    unlockAfter: 'l1m3',
+    steps: ['intro','content1','content2','quiz1','content3','quiz2','realtalk','complete']
+  },
+
+  // LAYER 2: TOOLS
+  {
+    id: 'l2m1', layer: 2, layerName: 'Applied Tools', required: false,
+    icon: '🧮', iconClass: 'icon-sky',
+    title: 'Debt Payoff Calculator',
+    desc: 'See exactly how long it takes to get out of debt.',
+    time: '5 min', xp: 70,
+    unlockAfter: 'l1m4',
+    steps: ['intro','calc1','complete']
+  },
+  {
+    id: 'l2m2', layer: 2, layerName: 'Applied Tools', required: false,
+    icon: '📅', iconClass: 'icon-sky',
+    title: 'Income Buffer Builder',
+    desc: 'Calculate your safety net for slow delivery weeks.',
+    time: '5 min', xp: 70,
+    unlockAfter: 'l1m4',
+    steps: ['intro','calc2','complete']
+  },
+
+  // LAYER 3: DEEP CONCEPTS
+  {
+    id: 'l3m1', layer: 3, layerName: 'Deep Concepts', required: false,
+    icon: '🛡️', iconClass: 'icon-lavender',
+    title: 'Building an Emergency Fund',
+    desc: 'Why even $500 saved changes everything.',
+    time: '6 min', xp: 75,
+    unlockAfter: 'l2m1',
+    steps: ['intro','content1','quiz1','complete']
+  },
+  {
+    id: 'l3m2', layer: 3, layerName: 'Deep Concepts', required: false,
+    icon: '📈', iconClass: 'icon-lavender',
+    title: 'Understanding Your Credit Score',
+    desc: 'What it means, why it matters, and how to improve it.',
+    time: '7 min', xp: 75,
+    unlockAfter: 'l3m1',
+    steps: ['intro','content1','quiz1','complete']
+  },
+
+  // LAYER 4: SCENARIOS
+  {
+    id: 'l4m1', layer: 4, layerName: 'Real Scenarios', required: false,
+    icon: '🎯', iconClass: 'icon-gold',
+    title: 'What Would You Do? Part 1',
+    desc: 'Four real-life money decisions. What\'s the smart play?',
+    time: '10 min', xp: 80,
+    unlockAfter: 'l3m1',
+    steps: ['intro','scenario1','scenario2','scenario3','scenario4','complete']
+  },
+  {
+    id: 'l4m2', layer: 4, layerName: 'Real Scenarios', required: false,
+    icon: '🎲', iconClass: 'icon-gold',
+    title: 'What Would You Do? Part 2',
+    desc: 'Four more scenarios — trickier situations, deeper decisions.',
+    time: '10 min', xp: 85,
+    unlockAfter: 'l4m1',
+    steps: ['intro','scenario5','scenario6','scenario7','scenario8','complete']
+  },
+
+  // LAYER 2 ADDITIONAL
+  {
+    id: 'l2m3', layer: 2, layerName: 'Applied Tools', required: false,
+    icon: '📋', iconClass: 'icon-sky',
+    title: 'Monthly Budget Builder',
+    desc: 'Build a real monthly budget and see where your money goes.',
+    time: '8 min', xp: 75,
+    unlockAfter: 'l1m4',
+    steps: ['intro','calc3','complete']
+  },
+
+  // LAYER 3 ADDITIONAL
+  {
+    id: 'l3m3', layer: 3, layerName: 'Deep Concepts', required: false,
+    icon: '🏠', iconClass: 'icon-lavender',
+    title: 'Fixed vs Variable Expenses',
+    desc: 'Know which costs are locked in and which you can actually control.',
+    time: '7 min', xp: 75,
+    unlockAfter: 'l2m1',
+    steps: ['intro','content1','content2','quiz1','realtalk','complete']
+  },
+  {
+    id: 'l3m4', layer: 3, layerName: 'Deep Concepts', required: false,
+    icon: '🏢', iconClass: 'icon-lavender',
+    title: 'The Real Cost of Your Apartment',
+    desc: 'Rent is just the beginning — see what shared living actually costs.',
+    time: '8 min', xp: 80,
+    unlockAfter: 'l3m3',
+    steps: ['intro','content1','content2','quiz1','realtalk','complete']
+  },
+
+  // LAYER 5: REFLECTION
+  {
+    id: 'l5m1', layer: 5, layerName: 'Reflection', required: false,
+    icon: '🪞', iconClass: 'icon-coral',
+    title: 'Monthly Check-In',
+    desc: 'Honest questions to measure real progress.',
+    time: '6 min', xp: 60,
+    unlockAfter: 'l3m2',
+    steps: ['intro','checkin1','checkin2','checkin3','checkin4','checkin5','checkin6','complete']
+  },
+];
+
+// ===== LESSON CONTENT =====
+const lessonContent = {
+  l1m1: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🎯 The One Rule That Changes Everything</h3>
+        <p>Before we talk budgets, apps, or spreadsheets — there's one principle that matters more than all of them combined:</p>
+        <div class="highlight-box">
+          <p>💡 Spend less than you earn. Every month. No exceptions.</p>
+        </div>
+        <p>Sounds obvious, right? But here's the thing — most people who struggle with money aren't failing because they don't know this rule. They're failing because nothing has made it <em>feel real</em> yet.</p>
+        <p>This module is about making it real.</p>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>🔴 The Gap That Grows</h3>
+        <p>When you spend more than you earn, the gap doesn't stay the same — it grows. Each month you overspend, you start the next month already behind. You're not just short on cash, you're fighting a growing hole.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ Example: Earn $1,800/mo. Spend $2,100/mo. That's a $300 gap — which becomes $600 in debt after 2 months, $900 after 3. In a year, that's $3,600 in the hole from just one small monthly gap.</p>
+        </div>
+        <p>The math is brutal but simple. The only way to stop the hole from growing is to flip the equation: spend <strong>less</strong> than you bring in — even by just a little.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">If you earn $1,500/month and spend $1,700/month, how much debt will you have after 6 months (starting from zero)?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$200</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$1,200</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,700</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$300</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Correct! $200/month × 6 months = $1,200. That's the power of a small monthly gap — it compounds fast.
+        </div>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>✅ The Flip Side</h3>
+        <p>The same math works in reverse. If you earn $1,500 and spend $1,300, you have $200 left over each month. After 6 months, that's $1,200 saved — which becomes your buffer, your emergency fund, your way out of the cycle.</p>
+        <div class="highlight-box">
+          <p>🌱 Even $50/month saved is $600/year — and it's the difference between a financial crisis and a speed bump when something unexpected happens.</p>
+        </div>
+        <p>The goal isn't perfection. It's flipping the direction. From red to even, from even to a little ahead. One step at a time.</p>
+      </div>
+    `,
+    content3: () => `
+      <div class="lesson-card">
+        <h3>🧠 Why It's So Hard to Stop Overspending</h3>
+        <p>Knowing you should spend less doesn't automatically make you do it. Your brain works against you in a few specific ways:</p>
+        <p><strong>Present bias</strong> — your brain values $20 today much more than $20 saved for next month, even though rationally they're the same. Immediate rewards beat future security almost every time.</p>
+        <p><strong>Invisible spending</strong> — small purchases don't feel real. A $12 lunch, a $4 coffee, a $9.99 subscription — none of them feel significant. But $12/day × 30 days = $360/month on lunch alone.</p>
+        <div class="highlight-box peach">
+          <p>💡 You're not bad with money because you're weak-willed. You're fighting instincts that evolved before money existed. Knowing the enemy is the first step to beating it.</p>
+        </div>
+        <p>The tools in this app are specifically designed to work <em>with</em> these tendencies rather than fight them head-on.</p>
+      </div>
+    `,
+    quiz2: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You buy a $5 coffee every single day. How much is that per year?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$600</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$900</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,300</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$1,825</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Right! $5 × 365 days = $1,825/year. That\'s nearly two months of rent for most people — just from one daily habit.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>Gig work makes this even harder. When you have a great week and $400 hits your account, it <em>feels</em> like abundance. Your brain says "I have money" — not "I need to budget this carefully."</p>
+        <p>But gig income isn't salary. That $400 week might be followed by a $180 week. The money you feel rich about today is what you'll desperately need in two weeks.</p>
+        <div class="highlight-box">
+          <p>🎯 One habit that helps: when a big payment hits, immediately move a set amount to a separate mental category — "bills money" — before you feel the abundance. What's left is what you actually have to spend.</p>
+        </div>
+      </div>
+    `,
+  },
+
+  l1m2: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🚗 The Gig Worker's Challenge</h3>
+        <p>Traditional budgeting advice assumes one thing: a steady, predictable paycheck. But gig work doesn't work like that. One week might bring in $600, the next only $280.</p>
+        <p>That unpredictability makes budgeting harder — but it also makes it <em>more important</em>. Without a strategy, you'll overspend in good weeks and panic in slow ones.</p>
+        <div class="highlight-box peach">
+          <p>🎯 Good news: there's a simple approach designed exactly for this situation.</p>
+        </div>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>📉 Budget to Your Worst Week</h3>
+        <p>The core strategy for gig income budgeting is this: <strong>build your budget around your worst realistic income, not your best or average.</strong></p>
+        <p>Think about your slowest recent month — what did you actually bring in? That's your budget baseline. If you can cover all your needs on that number, you'll never be caught short.</p>
+        <div class="highlight-box">
+          <p>💡 If your slow month brings in $1,200 and your good month brings in $1,800, budget for $1,200. The extra $600 in good months becomes savings or debt payoff — not extra spending.</p>
+        </div>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>🏦 The Income Buffer Account</h3>
+        <p>Here's a powerful technique: treat your bank account like a reservoir, not a wallet.</p>
+        <p>When you earn more than your baseline, don't spend it — let it pool. When you earn less, draw from the pool. Your spending stays level even when your income bounces around.</p>
+        <div class="highlight-box">
+          <p>🎯 Goal: Keep at least 2 weeks of baseline income in your account at all times. That's your minimum safe balance — treat it like it doesn't exist.</p>
+        </div>
+        <p>This single habit eliminates most overdraft risk for gig workers.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You had a great week and earned $400 more than usual. What's the smartest move?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Treat yourself — you earned it!</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">Keep it in the account as your income buffer</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Split it: half fun, half bills</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Pay only the current month's bills with it</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Right! Extra income in good weeks is your protection for slow weeks. Let it build before you spend it.
+        </div>
+      </div>
+    `,
+    content3: () => `
+      <div class="lesson-card">
+        <h3>📆 Timing Matters as Much as Amount</h3>
+        <p>With gig income, <em>when</em> money arrives is just as important as how much arrives. If your rent is due on the 1st but your best delivery days are the 5th through the 10th, you have a timing problem — even if the money eventually shows up.</p>
+        <p>The solution is to think about your month in two parts:</p>
+        <p><strong>Committed money</strong> — everything that's already spoken for: rent, utilities, auto-debits, minimum debt payments. This comes first, always.</p>
+        <p><strong>Available money</strong> — what's left after committed expenses. This is what you actually budget for food, gas, personal spending.</p>
+        <div class="highlight-box">
+          <p>🗓️ Map out which bills hit on which dates. Then map your typical income timing. The gaps between those two things are where overdrafts happen.</p>
+        </div>
+      </div>
+    `,
+    quiz2: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">Your monthly committed expenses total $950. Your slow months bring in $1,100. How much is truly "available to spend" in a slow month?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,100 — that's what's in my account</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$200 — save the rest</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$150 — after expenses and a small buffer</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$950 — just cover bills</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Exactly right. $1,100 income minus $950 expenses = $150 truly available. That small margin is why a buffer matters so much — one bad week erases it entirely.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>Delivery work has real hidden costs that eat into your income before you even see it — gas, car maintenance, phone data, and the wear on your vehicle. A rough estimate: for every $10 you earn delivering, $2–$3 goes to vehicle costs.</p>
+        <p>That means a week where you "earned $400" might be closer to $280–$320 in actual take-home value once you factor in the cost of earning it.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ This doesn't mean gig work isn't worth it — it absolutely can be. But budgeting on gross earnings without factoring in costs is one of the most common gig worker money mistakes.</p>
+        </div>
+      </div>
+    `,
+  },
+
+  l1m3: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🔁 The Hidden Money Drain</h3>
+        <p>Automatic debits are one of the sneakiest budget wreckers. You set them up once and forget about them — but they never forget about <em>you</em>.</p>
+        <p>Subscriptions, insurance, phone bills, streaming services — each one is a scheduled hole in your account. The problem isn't having them. The problem is not knowing exactly when and how much they'll hit.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ Every dollar that leaves your account automatically is a dollar you need to have set aside — before you spend anything else.</p>
+        </div>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>📋 Map Your Automatic Debits</h3>
+        <p>The first step is building a complete list of everything that comes out automatically. Most people are surprised when they actually add it up.</p>
+        <p>For each debit, you need to know three things: <strong>what it is</strong>, <strong>how much it is</strong>, and <strong>what date it hits</strong>.</p>
+        <div class="highlight-box">
+          <p>✏️ Exercise: Scroll through 2 months of your bank history and write down every recurring charge. Check for subscriptions you forgot about — they're common and easy to cancel.</p>
+        </div>
+        <p>Once you have the full list, add them up. That total is committed money — it's gone before you even look at your balance.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">Your rent auto-drafts on the 1st. Your phone auto-drafts on the 3rd. You get paid on the 5th. What could go wrong?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Nothing — the dates are close enough</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">Both debits could overdraft before your paycheck arrives</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">The phone bill might be late</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Nothing if you have Ally's CoverDraft</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Exactly. Timing is everything. Bills that hit before income arrives create overdraft risk — you need a buffer that covers the gap.
+        </div>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>🛡️ The Minimum Safe Balance</h3>
+        <p>Here's a simple rule that prevents most overdrafts: <strong>set a minimum balance floor and treat it as zero.</strong></p>
+        <p>Pick an amount — $150 or $200 works well to start. Train yourself to think your account is empty when it hits that number. Never spend below it intentionally.</p>
+        <div class="highlight-box">
+          <p>💡 That floor is your automatic debit safety net. When a charge hits unexpectedly, it comes out of the floor — not out of a zero balance.</p>
+        </div>
+        <p>Over time, as your situation improves, you can raise the floor. But even a $100 floor eliminates most of the chaos.</p>
+      </div>
+    `,
+    content3: () => `
+      <div class="lesson-card">
+        <h3>✂️ The Subscription Audit</h3>
+        <p>The average person has 4–6 active subscriptions and can only name 2–3 of them off the top of their head. The forgotten ones are the dangerous ones.</p>
+        <p>Common culprits: streaming services (Netflix, Hulu, Disney+, Max), music (Spotify, Apple Music), gaming, cloud storage, news sites, app subscriptions, gym memberships, and free trials that became paid without you noticing.</p>
+        <div class="highlight-box peach">
+          <p>💡 The 30-day rule: if you haven't used a subscription in 30 days, cancel it. You can always resubscribe if you miss it. Most people never do.</p>
+        </div>
+        <p>Even canceling 2–3 forgotten subscriptions at $10–15 each frees up $30–45/month — over $400/year that can go toward debt instead.</p>
+      </div>
+    `,
+    quiz2: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You find you're paying for Netflix ($15), a gaming subscription ($10), and a music app ($10) you rarely use. You cancel all three. What does that free up per year?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$35</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$210</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$420</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$105</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Correct! $35/month × 12 = $420/year. Applied to credit card debt, that could eliminate hundreds in interest charges.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>When you share an apartment, automatic debits get complicated. Some bills might be in your name, some in your partner's. If your girlfriend's Netflix is auto-drafting from your account, or vice versa, that's money leaving that you might not be tracking.</p>
+        <p>It's worth having a direct conversation about shared expenses: who pays what, from which account, on which date. Couples who are clear on this have far fewer money arguments and far fewer overdrafts.</p>
+        <div class="highlight-box">
+          <p>🤝 Suggestion: Make a shared list of every automatic expense and who it comes out of. Review it together once a month. It's a small habit that prevents a lot of stress.</p>
+        </div>
+      </div>
+    `,
+  },
+
+  l1m4: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>💳 Credit Cards: The Silent Tax</h3>
+        <p>Credit card debt is one of the most expensive kinds of debt that exists — but most people don't feel how expensive it is, because the cost hides in small monthly payments.</p>
+        <p>This module is about making the true cost visible. Because once you see the real numbers, the motivation to pay it off becomes much stronger.</p>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>🔢 How Interest Really Works</h3>
+        <p>Most credit cards charge between 20% and 29% annual interest (APR). That means every $1,000 you carry costs you $200–$290 per year — just to hold the balance.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ If you only make minimum payments on a $2,000 balance at 24% APR, it can take over 10 years to pay off — and you'll pay nearly $2,000 in interest alone. You'll pay for the debt twice.</p>
+        </div>
+        <p>The minimum payment is designed to keep you in debt as long as possible. It covers mostly interest, barely touching the actual balance.</p>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>⚡ The Power of Paying More</h3>
+        <p>Even a small increase over the minimum payment dramatically shortens the payoff timeline.</p>
+        <div class="highlight-box">
+          <p>💡 On a $1,500 balance at 24% APR:<br>
+          Minimum payment (~$38/mo): ~9 years, ~$1,900 in interest<br>
+          $75/mo: ~2.5 years, ~$720 in interest<br>
+          $150/mo: ~1 year, ~$330 in interest</p>
+        </div>
+        <p>The goal isn't to pay it all off overnight. The goal is to pay <em>more than the minimum</em>, consistently. Even $20 extra per month makes a real difference over time.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You have a $1,000 credit card balance at 24% APR. You only pay the minimum each month. Approximately how much total interest will you pay over the life of the debt?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$50–$100</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$200–$300</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$900–$1,100</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,500+</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ That's right. You'll pay nearly as much in interest as you originally borrowed — just from making minimum payments. That's why paying more matters so much.
+        </div>
+      </div>
+    `,
+    content3: () => `
+      <div class="lesson-card">
+        <h3>🎯 Two Payoff Strategies That Work</h3>
+        <p>If you have multiple credit card balances, there are two proven approaches to paying them off:</p>
+        <p><strong>The Avalanche Method</strong> — pay minimums on all cards, then throw every extra dollar at the card with the <em>highest interest rate</em>. This saves the most money mathematically.</p>
+        <p><strong>The Snowball Method</strong> — pay minimums on all cards, then attack the card with the <em>smallest balance</em> first. Once it's gone, roll that payment to the next smallest. This builds momentum and motivation.</p>
+        <div class="highlight-box">
+          <p>💡 Research shows the Snowball Method often works better in practice — not because it saves more money, but because the quick wins keep people motivated. The best strategy is the one you'll actually stick to.</p>
+        </div>
+      </div>
+    `,
+    quiz2: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You have two credit cards: Card A has a $300 balance at 29% APR. Card B has a $1,200 balance at 18% APR. Using the Avalanche method, which do you attack first?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, true)">Card A — higher interest rate costs more per dollar</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Card B — bigger balance is more urgent</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Split payments equally between both</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">It doesn't matter — both strategies are identical</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Right! Avalanche targets the highest APR first — Card A at 29% is costing you more per dollar than Card B at 18%, so eliminating it first saves the most money overall.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>There's a trap many people fall into: using a credit card to cover everyday expenses when cash is short, then paying just the minimum, which means you never quite pay it off. The balance creeps up slowly — $50 here, $80 there — until one day it's become a serious problem.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ If your credit card balance is growing month over month — even slowly — that's a warning sign. The goal is a balance that goes down every single month, no matter how slowly.</p>
+        </div>
+        <p>Even if you can only pay $5 more than the minimum this month, do it. The habit of paying more than minimum is more important than the amount right now.</p>
+      </div>
+    `,
+  },
+
+  l2m1: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🧮 See Your Debt in a New Way</h3>
+        <p>Understanding debt intellectually is one thing. Seeing your specific numbers laid out is another. Use this calculator to find out exactly when you'll be debt-free — and how much you'll save by paying a little more each month.</p>
+        <p>No data is saved. All calculations happen right here in the app.</p>
+      </div>
+    `,
+    calc1: () => `
+      <div class="calc-card">
+        <div class="calc-title">💳 Debt Payoff Calculator</div>
+        <div class="calc-desc">Enter your credit card details to see your payoff timeline.</div>
+        <div class="calc-row">
+          <label class="calc-label">Current Balance ($)</label>
+          <input class="calc-input" type="number" id="calc-balance" placeholder="e.g. 1500" min="0">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Interest Rate (APR %)</label>
+          <input class="calc-input" type="number" id="calc-apr" placeholder="e.g. 24" min="0" max="100">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Monthly Payment ($)</label>
+          <input class="calc-input" type="number" id="calc-payment" placeholder="e.g. 75" min="0">
+        </div>
+        <button class="calc-btn" onclick="calcDebt()">Calculate Payoff →</button>
+        <div class="calc-result" id="debt-result">
+          <div class="calc-result-label">Payoff Timeline</div>
+          <div class="calc-result-value" id="debt-months"></div>
+          <div class="calc-result-note" id="debt-note"></div>
+        </div>
+      </div>
+    `,
+  },
+
+  l2m2: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>📅 Your Income Buffer Calculator</h3>
+        <p>For gig workers, the income buffer is your financial shock absorber. This tool helps you figure out exactly how much you need to keep in your account to weather a slow week without stress.</p>
+      </div>
+    `,
+    calc2: () => `
+      <div class="calc-card">
+        <div class="calc-title">🛡️ Income Buffer Calculator</div>
+        <div class="calc-desc">Calculate how much buffer you need to avoid overdrafts during slow weeks.</div>
+        <div class="calc-row">
+          <label class="calc-label">Monthly Fixed Expenses ($)</label>
+          <input class="calc-input" type="number" id="calc-fixed" placeholder="e.g. 950" min="0">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Your Slowest Monthly Income ($)</label>
+          <input class="calc-input" type="number" id="calc-slow" placeholder="e.g. 1100" min="0">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Your Average Monthly Income ($)</label>
+          <input class="calc-input" type="number" id="calc-avg" placeholder="e.g. 1500" min="0">
+        </div>
+        <button class="calc-btn" onclick="calcBuffer()">Calculate My Buffer →</button>
+        <div class="calc-result" id="buffer-result">
+          <div class="calc-result-label">Recommended Buffer</div>
+          <div class="calc-result-value" id="buffer-amount"></div>
+          <div class="calc-result-note" id="buffer-note"></div>
+        </div>
+      </div>
+    `,
+  },
+
+  l2m3: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>📋 Build Your First Real Budget</h3>
+        <p>A budget isn't a restriction — it's a plan. When you tell your money where to go before the month starts, you stop wondering where it went at the end.</p>
+        <p>This tool walks you through building a simple monthly budget based on your actual income and expenses. No data is saved — this is just for your eyes, right now, to help you see the full picture.</p>
+        <div class="highlight-box">
+          <p>💡 The goal isn't a perfect budget. It's an honest one. Even seeing the numbers — even if they're uncomfortable — is more useful than not knowing.</p>
+        </div>
+      </div>
+    `,
+    calc3: () => `
+      <div class="calc-card">
+        <div class="calc-title">📋 Monthly Budget Builder</div>
+        <div class="calc-desc">Enter your income and expenses to see your monthly picture. All values are estimates — just get close.</div>
+        <div class="calc-row">
+          <label class="calc-label">Monthly Income (after gig costs) ($)</label>
+          <input class="calc-input" type="number" id="bud-income" placeholder="e.g. 1400" min="0" oninput="calcBudget()">
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 8px">Fixed Expenses</div>
+        <div class="calc-row">
+          <label class="calc-label">Rent / Your share ($)</label>
+          <input class="calc-input" type="number" id="bud-rent" placeholder="e.g. 600" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Phone bill ($)</label>
+          <input class="calc-input" type="number" id="bud-phone" placeholder="e.g. 85" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Utilities / Internet ($)</label>
+          <input class="calc-input" type="number" id="bud-utilities" placeholder="e.g. 80" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Minimum debt payments ($)</label>
+          <input class="calc-input" type="number" id="bud-debt" placeholder="e.g. 40" min="0" oninput="calcBudget()">
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;margin:16px 0 8px">Variable Expenses</div>
+        <div class="calc-row">
+          <label class="calc-label">Groceries ($)</label>
+          <input class="calc-input" type="number" id="bud-groceries" placeholder="e.g. 200" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Gas / Transportation ($)</label>
+          <input class="calc-input" type="number" id="bud-gas" placeholder="e.g. 120" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Eating out / Entertainment ($)</label>
+          <input class="calc-input" type="number" id="bud-fun" placeholder="e.g. 150" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Subscriptions ($)</label>
+          <input class="calc-input" type="number" id="bud-subs" placeholder="e.g. 40" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-row">
+          <label class="calc-label">Other / Miscellaneous ($)</label>
+          <input class="calc-input" type="number" id="bud-misc" placeholder="e.g. 50" min="0" oninput="calcBudget()">
+        </div>
+        <div class="calc-result show" id="budget-result" style="margin-top:20px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <div class="calc-result-label">Monthly Income</div>
+              <div class="calc-result-value" id="bud-total-income" style="font-size:22px">$0</div>
+            </div>
+            <div>
+              <div class="calc-result-label">Total Expenses</div>
+              <div class="calc-result-value" id="bud-total-expenses" style="font-size:22px">$0</div>
+            </div>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.3);padding-top:12px">
+            <div class="calc-result-label" id="bud-status-label">Monthly Surplus / Deficit</div>
+            <div class="calc-result-value" id="bud-surplus">$0</div>
+            <div class="calc-result-note" id="bud-advice">Enter your numbers above to see your budget picture.</div>
+          </div>
+        </div>
+      </div>
+    `,
+  },
+
+  l3m3: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🏠 Two Types of Expenses — One Key Difference</h3>
+        <p>Not all expenses are created equal. Some you're locked into regardless of what happens. Others you can adjust when money is tight.</p>
+        <p>Understanding which is which is one of the most practical financial skills you can have — because it tells you exactly where you have control when you need to cut back.</p>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>🔒 Fixed Expenses</h3>
+        <p>Fixed expenses are the ones that stay the same every month no matter what. You've committed to them — they're going out whether you had a good week or a slow one.</p>
+        <p>Examples: rent, car payment, insurance, phone bill, internet, minimum debt payments, gym membership.</p>
+        <div class="highlight-box coral">
+          <p>⚠️ Fixed expenses are the most dangerous kind because they don't flex when your income dips. If your fixed expenses are too high relative to your income, even a single slow week creates a crisis.</p>
+        </div>
+        <p>The rule of thumb: your total fixed expenses should be no more than 50–60% of your baseline monthly income. If they're higher, you have almost no margin for error.</p>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>🔓 Variable Expenses</h3>
+        <p>Variable expenses change based on your choices and circumstances. They're the expenses you actually have control over.</p>
+        <p>Examples: groceries, gas, eating out, entertainment, clothing, personal care, subscriptions.</p>
+        <div class="highlight-box">
+          <p>💡 Variable expenses are your budget's pressure valve. When a slow week hits, this is where you cut. Knowing exactly which expenses are variable — and by how much — tells you how much breathing room you actually have.</p>
+        </div>
+        <p>Most people underestimate their variable spending significantly. Small daily purchases add up to large monthly totals faster than feels possible.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">Which of these is a FIXED expense?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Weekly groceries</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Eating out with friends</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">Your monthly phone bill</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">Gas for your car</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Correct! Your phone bill is a fixed amount that doesn't change month to month — it's committed spending. The others vary based on your choices and usage.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>Here's a useful exercise: write down every monthly expense and label it F (fixed) or V (variable). Then add up the fixed total. Divide by your baseline monthly income.</p>
+        <p>If that number is above 60%, you're running tight. Above 75% and you're in a zone where one slow week can cause real damage — because there's almost nothing left to cut from the variable side.</p>
+        <div class="highlight-box">
+          <p>🎯 The goal over time: reduce your fixed expenses as a percentage of income, either by increasing income or by gradually eliminating fixed costs you don't truly need. Every fixed expense you eliminate permanently improves your financial stability.</p>
+        </div>
+      </div>
+    `,
+  },
+
+  l3m4: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🏢 Rent Is Just the Beginning</h3>
+        <p>When people calculate if they can afford an apartment, they usually only think about the rent number. But the true monthly cost of your living situation is significantly higher once you add everything up.</p>
+        <p>This module breaks down the full picture — especially relevant when you're splitting costs with a partner, where money conversations can get complicated.</p>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>💰 The Full Cost of Your Apartment</h3>
+        <p>Beyond rent, a typical apartment involves several recurring costs that need to be budgeted for:</p>
+        <div class="highlight-box">
+          <p>
+            🏠 <strong>Rent</strong> — the base<br>
+            ⚡ <strong>Electricity</strong> — varies by season, typically $60–$120/mo<br>
+            💧 <strong>Water/trash</strong> — sometimes included, sometimes $30–$60/mo<br>
+            🌐 <strong>Internet</strong> — $50–$80/mo<br>
+            🛡️ <strong>Renters insurance</strong> — often overlooked, ~$15–$20/mo but important<br>
+            🧹 <strong>Household supplies</strong> — cleaning products, paper goods, ~$30–$50/mo<br>
+            🔧 <strong>Small repairs/replacements</strong> — budget ~$20–$30/mo on average
+          </p>
+        </div>
+        <p>Add these up and the true monthly cost of your apartment is typically $150–$300 more than just the rent number.</p>
+      </div>
+    `,
+    content2: () => `
+      <div class="lesson-card">
+        <h3>🤝 Splitting Costs With a Partner</h3>
+        <p>Sharing an apartment with a partner or girlfriend can cut costs significantly — but only if you're both clear and aligned on the financial arrangement. Vague agreements lead to resentment and money stress.</p>
+        <p>There are three common approaches:</p>
+        <p><strong>50/50 split</strong> — everything divided equally. Simple, but can feel unfair if incomes are very different.</p>
+        <p><strong>Proportional split</strong> — each person pays a percentage based on their income. More equitable but requires income transparency.</p>
+        <p><strong>Divided responsibility</strong> — one person pays rent, the other pays utilities and groceries. Each "owns" certain bills.</p>
+        <div class="highlight-box peach">
+          <p>💡 Whatever method you choose, write it down. A simple note with who pays what and when eliminates most money arguments before they start.</p>
+        </div>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">Your rent is $1,100/month. Adding utilities ($90), internet ($65), renters insurance ($18), and household supplies ($40), what is the true monthly housing cost?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,100</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,200</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$1,313</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$1,450</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Exactly. $1,100 + $90 + $65 + $18 + $40 = $1,313. That's $213/month more than rent alone — which is why budgeting only for rent consistently leaves people short.
+        </div>
+      </div>
+    `,
+    realtalk: () => `
+      <div class="lesson-card" style="border-left: 5px solid var(--peach); background: linear-gradient(135deg, #fff8f3, white);">
+        <h3>💬 Real Talk</h3>
+        <p>One of the most common money problems in shared living: one person assumes the other is covering something, and neither actually is. An unexpected bill arrives, there's no plan for it, and it creates stress or conflict.</p>
+        <p>The fix is simple but requires a direct conversation: sit down together and list every expense related to your apartment. Agree on exactly who pays what. Put a reminder in your phone for when each bill is due.</p>
+        <div class="highlight-box">
+          <p>🏆 Couples who talk openly about money — even when it's uncomfortable — have significantly less financial stress than those who avoid it. Starting that habit now, even with small conversations, builds a foundation for bigger financial decisions down the road.</p>
+        </div>
+      </div>
+    `,
+  },
+
+  l3m1: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🛡️ Why $500 is a Superpower</h3>
+        <p>An emergency fund sounds boring. It isn't. It's the single thing that separates people who stay stuck in the debt cycle from people who break out of it.</p>
+        <p>Without a buffer, every unexpected expense — car repair, medical bill, slow work week — goes on a credit card or causes an overdraft. The debt grows. The stress grows.</p>
+        <div class="highlight-box">
+          <p>💡 With even $500 in savings, you can absorb a typical emergency without adding to your debt. That changes everything.</p>
+        </div>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>🎯 The $500 Starting Goal</h3>
+        <p>Don't think about saving $10,000. Start with $500. It's achievable in 2–3 months even on tight income, and it provides real protection.</p>
+        <p>The strategy: treat the emergency fund like a bill. Automatically set aside a fixed amount — even $25 or $50 — every time you get paid. Don't wait to see what's left. Move it first.</p>
+        <div class="highlight-box peach">
+          <p>🎯 "Pay yourself first" — save before you spend. Even small amounts build up. $25/week = $1,300/year.</p>
+        </div>
+        <p>Once you hit $500, keep going to 1 month of expenses, then 2. But start with $500.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">You have $300 in savings and your car needs a $400 repair. You don't have an emergency fund. What's most likely to happen?</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">You'll easily cover it from your regular income</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">It goes on a credit card, adding to your debt</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">The car gets fixed for free somehow</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">You skip fixing it and it resolves itself</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Exactly. Without a buffer, emergencies become debt. That's the cycle. An emergency fund breaks it.
+        </div>
+      </div>
+    `,
+  },
+
+  l3m2: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>📈 Your Credit Score Explained</h3>
+        <p>Your credit score is a number between 300 and 850 that lenders use to decide whether to loan you money — and at what interest rate. A higher score means cheaper loans, better apartment applications, and more financial options.</p>
+        <p>The good news: even if your score is low right now, the habits you're building in this app will improve it over time.</p>
+      </div>
+    `,
+    content1: () => `
+      <div class="lesson-card">
+        <h3>🔢 What Goes Into Your Score</h3>
+        <p>Your credit score is made up of five factors, in order of importance:</p>
+        <div class="highlight-box">
+          <p>
+            🟢 <strong>Payment history (35%)</strong> — Do you pay on time?<br>
+            🟡 <strong>Credit utilization (30%)</strong> — How much of your limit are you using?<br>
+            🔵 <strong>Length of history (15%)</strong> — How long have you had accounts?<br>
+            🟣 <strong>Credit mix (10%)</strong> — Different types of credit<br>
+            ⚪ <strong>New inquiries (10%)</strong> — Recent applications for credit
+          </p>
+        </div>
+        <p>The two biggest factors — payment history and utilization — are also the ones you can most directly control. Pay on time, and keep your card balance below 30% of the limit.</p>
+      </div>
+    `,
+    quiz1: () => `
+      <div class="quiz-card">
+        <div class="quiz-q">Your credit card has a $1,000 limit. For the best credit score impact, your balance should stay below:</div>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$500 (50%)</button>
+          <button class="quiz-option" onclick="answerQuiz(this, true)">$300 (30%)</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$800 (80%)</button>
+          <button class="quiz-option" onclick="answerQuiz(this, false)">$100 (10%)</button>
+        </div>
+        <div class="quiz-feedback" id="quiz-feedback">
+          ✅ Correct! Keeping utilization below 30% is the standard recommendation. Under 10% is even better for your score, but 30% is a solid target.
+        </div>
+      </div>
+    `,
+  },
+
+  l4m1: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🎯 Real Money Decisions</h3>
+        <p>Knowing the right thing to do and actually doing it are two different skills. In this module, you'll face four realistic situations — the kind that come up in everyday life — and choose how to handle them.</p>
+        <p>There's no single "perfect" answer for every situation, but some choices lead to much better outcomes than others. Let's find out what you'd do.</p>
+      </div>
+    `,
+    scenario1: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 1 of 3</div>
+        <div class="scenario-story">
+          It's Thursday. You just had your best delivery week ever — you made $650. Your rent is due on the 1st (10 days away), and you have $200 in your account. Your rent is $750. You also have $1,200 in credit card debt.
+        </div>
+        <div class="scenario-q">What do you do with the $650?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s1')">Set aside $750 for rent, use the remaining $100 to pay extra on the credit card</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s1')">Put the whole $650 in savings for now, figure out rent later</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s1')">You've been grinding — treat yourself to something nice this weekend</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s1')">Pay the minimum on the credit card, save the rest</button>
+        </div>
+        <div class="scenario-result" id="s1-result"></div>
+      </div>
+    `,
+    scenario2: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 2 of 3</div>
+        <div class="scenario-story">
+          It's a slow week and you only made $280. Your phone auto-payment of $85 is due tomorrow, and your food budget for the week is running low. You have $120 in your account.
+        </div>
+        <div class="scenario-q">What's your move?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s2')">Let the phone payment go through, spend only $35 on groceries this week, work extra shifts</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s2')">Put groceries on the credit card so you can cover the phone bill</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s2')">Call the phone company to delay the payment by a week</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s2')">Ignore the phone payment and hope it works out</button>
+        </div>
+        <div class="scenario-result" id="s2-result"></div>
+      </div>
+    `,
+    scenario3: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 3 of 4</div>
+        <div class="scenario-story">
+          Your girlfriend suggests you both upgrade your apartment — it's $250/month more, but it's nicer and has in-unit laundry. Between you, you currently break even every month (income = expenses). She says you can cut back on eating out to make it work.
+        </div>
+        <div class="scenario-q">How do you think about this decision?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s3')">Run the actual numbers first — can you each genuinely cut $125/month from your budget?</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s3')">Go for it — in-unit laundry is worth it and you'll figure it out</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s3')">Suggest trying to save the extra $250/month first for 2 months to test if it's realistic</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s3')">Agree, but plan to pick up extra delivery shifts to cover the difference</button>
+        </div>
+        <div class="scenario-result" id="s3-result"></div>
+      </div>
+    `,
+    scenario4: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 4 of 4</div>
+        <div class="scenario-story">
+          You notice three streaming subscriptions on your bank statement that you haven't used in over a month — Netflix ($15), a gaming service ($10), and a music app ($10). That's $35/month. You also have $1,000 in credit card debt at 24% APR.
+        </div>
+        <div class="scenario-q">What do you do with the $35/month if you cancel all three?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s4')">Cancel all three and add the $35 to your credit card payment each month</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s4')">Cancel the two you use least, keep one</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s4')">Cancel them but don't change your credit card payment — use the $35 for fun money</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s4')">Keep them — $35/month isn't worth the hassle of canceling</button>
+        </div>
+        <div class="scenario-result" id="s4-result"></div>
+      </div>
+    `,
+  },
+
+  l4m2: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🎲 More Real Decisions</h3>
+        <p>Part 2 covers situations that are a little trickier — where the "right" answer isn't obvious and competing priorities make it harder to choose. These are the moments where financial habits are really built or broken.</p>
+      </div>
+    `,
+    scenario5: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 1 of 4</div>
+        <div class="scenario-story">
+          Your car needs an oil change ($60) and new wiper blades ($25). You've been putting it off for 2 months because cash has been tight. You just got paid $320 and have $85 in your account. Rent is due in 3 weeks ($700).
+        </div>
+        <div class="scenario-q">What's your approach to the car maintenance?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s5')">Do the oil change and wipers now — your car is your income source</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s5')">Do the oil change only, skip wipers for now</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s5')">Skip both and save the money for rent</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s5')">Put the car maintenance on your credit card</button>
+        </div>
+        <div class="scenario-result" id="s5-result"></div>
+      </div>
+    `,
+    scenario6: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 2 of 4</div>
+        <div class="scenario-story">
+          A friend asks to borrow $100 — says he'll pay you back in two weeks. You have $180 in your account, your phone bill ($85) auto-drafts in 5 days, and you won't get paid again for 8 days. Your friend has borrowed money before and paid back slowly.
+        </div>
+        <div class="scenario-q">What do you do?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s6')">Explain you can't right now — your phone bill hits in 5 days and you'd overdraft</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s6')">Offer $30-40 if you can spare it, explain you can't do more</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s6')">Lend the $100 — he's your friend and said two weeks</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s6')">Lend it and hope your paycheck comes in before the phone bill hits</button>
+        </div>
+        <div class="scenario-result" id="s6-result"></div>
+      </div>
+    `,
+    scenario7: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 3 of 4</div>
+        <div class="scenario-story">
+          You've been working hard and staying on budget for 6 weeks. You have an extra $80 this month. Your credit card balance is $1,200. You also have only $150 in savings and no real emergency fund.
+        </div>
+        <div class="scenario-q">What do you do with the $80?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s7')">Split it: $40 to savings, $40 extra to credit card</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s7')">Put it all toward the credit card — eliminate debt first</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s7')">Put it all in savings — you need an emergency fund more</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s7')">Treat yourself — you've been disciplined and deserve it</button>
+        </div>
+        <div class="scenario-result" id="s7-result"></div>
+      </div>
+    `,
+    scenario8: () => `
+      <div class="scenario-card">
+        <div class="calc-title">📖 Scenario 4 of 4</div>
+        <div class="scenario-story">
+          Your girlfriend suggests you both open a joint account for shared expenses — rent, utilities, groceries. Her plan: you each deposit $600/month into it and pay all household bills from there. Your current budget is already very tight and $600 is more than your current share of expenses.
+        </div>
+        <div class="scenario-q">How do you respond?</div>
+        <div class="scenario-options">
+          <button class="scenario-option" onclick="answerScenario(this,'best','s8')">Have an honest conversation — show your numbers and suggest a lower amount that works for your budget</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s8')">Agree to $600 — you'll figure out how to make it work</button>
+          <button class="scenario-option" onclick="answerScenario(this,'ok','s8')">Suggest starting with just shared rent and utilities, not groceries</button>
+          <button class="scenario-option" onclick="answerScenario(this,'bad','s8')">Decline entirely — joint finances are too complicated</button>
+        </div>
+        <div class="scenario-result" id="s8-result"></div>
+      </div>
+    `,
+  },
+
+  l5m1: {
+    intro: () => `
+      <div class="lesson-card">
+        <h3>🪞 Time to Be Honest</h3>
+        <p>This check-in isn't a test. There are no right or wrong answers — only honest ones. The goal is to help you see your actual progress and identify where to focus next.</p>
+        <p>Six questions covering the habits that matter most. Come back to this module every month and watch your answers shift over time.</p>
+        <div class="highlight-box">
+          <p>💡 Nothing is saved from this check-in. It's purely for your own reflection — complete privacy guaranteed.</p>
+        </div>
+      </div>
+    `,
+    checkin1: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">This month, did you spend less than you earned?</div>
+        <div class="checkin-sub">Even by a small amount counts. Be honest.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c1')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c1')">❌ No</button>
+        </div>
+        <div class="checkin-response" id="c1-response"></div>
+      </div>
+    `,
+    checkin2: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">Did you avoid overdrafting your account this month?</div>
+        <div class="checkin-sub">Even if it was close, a yes is a yes.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c2')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c2')">❌ No</button>
+        </div>
+        <div class="checkin-response" id="c2-response"></div>
+      </div>
+    `,
+    checkin3: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">Did you pay more than the minimum on your credit card?</div>
+        <div class="checkin-sub">Even $5 extra counts.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c3')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c3')">❌ No</button>
+        </div>
+        <div class="checkin-response" id="c3-response"></div>
+      </div>
+    `,
+    checkin4: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">Did you cancel or avoid at least one unnecessary expense this month?</div>
+        <div class="checkin-sub">A subscription, an impulse purchase you decided against, a cheaper option you chose.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c4')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c4')">❌ No</button>
+        </div>
+        <div class="checkin-response" id="c4-response"></div>
+      </div>
+    `,
+    checkin5: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">Did you add anything to savings this month — even a small amount?</div>
+        <div class="checkin-sub">$5, $20, $50 — any positive number counts.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c5')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c5')">❌ No</button>
+        </div>
+        <div class="checkin-response" id="c5-response"></div>
+      </div>
+    `,
+    checkin6: () => `
+      <div class="checkin-card">
+        <div class="checkin-q">Do you feel more in control of your money than you did last month?</div>
+        <div class="checkin-sub">This is about awareness and confidence, not just numbers.</div>
+        <div class="checkin-btns">
+          <button class="checkin-btn yes" onclick="answerCheckin(this,'yes','c6')">✅ Yes</button>
+          <button class="checkin-btn no" onclick="answerCheckin(this,'no','c6')">❌ Not yet</button>
+        </div>
+        <div class="checkin-response" id="c6-response"></div>
+      </div>
+    `,
+  },
+};
+
+const checkinResponses = {
+  c1: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '🎉 That\'s the foundation! Every month you do this, you move forward. Keep the streak going.' },
+    no: { bg: '#fce4ec', color: '#c62828', text: '💪 Honest answer takes courage. Look at what pushed you over — was it one category? One week? Knowing where the gap is helps you close it.' }
+  },
+  c2: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '✅ Solid! No overdraft means your timing and balance management are improving. That\'s real progress.' },
+    no: { bg: '#fce4ec', color: '#c62828', text: '🔍 Overdrafts usually come from timing issues more than lack of money. Review Module 3 — the minimum safe balance strategy can help prevent this.' }
+  },
+  c3: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '⚡ Every extra dollar cuts your payoff time. Small consistent efforts compound into big results.' },
+    no: { bg: '#fce4ec', color: '#c62828', text: '📌 Even $10 extra matters more than you think over time. If cash is tight, set a goal for next month: just $10 above minimum. Small wins build momentum.' }
+  },
+  c4: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '✂️ That\'s the awareness habit in action. Noticing an unnecessary expense and acting on it — even once — builds the muscle for doing it consistently. What did you cut or avoid?' },
+    no: { bg: '#fce4ec', color: '#c62828', text: '🔍 This is worth a focused look next month. Spend 5 minutes scanning your bank statement for anything you\'re paying for that you don\'t actively use or need. One cancellation can free up meaningful money.' }
+  },
+  c5: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '🌱 Yes! Even a small amount is a win. Savings isn\'t about the amount right now — it\'s about the habit. Every time you save something, you\'re telling yourself a different story about who you are financially.' },
+    no: { bg: '#fce4ec', color: '#c62828', text: '💭 This is often the hardest one when money is tight. If there was genuinely nothing left, that\'s real information — it means expenses need to come down or income needs to go up before savings is possible. If there was a little but it got spent, that\'s where the "pay yourself first" habit comes in.' }
+  },
+  c6: {
+    yes: { bg: '#e8f5e9', color: '#2e7d32', text: '🏆 This is the most important answer of all. Financial confidence grows with knowledge and small wins. The fact that you feel more in control means the habits are working — keep going.' },
+    no: { bg: '#fff9e6', color: '#856404', text: '💪 That\'s an honest answer, and it counts for something. Awareness is the first step — even recognizing what\'s not working is progress. What\'s one small thing you could change next month that would make you feel slightly more in control?' }
+  }
+};
+
+const scenarioFeedback = {
+  s1: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Excellent! Securing rent first is non-negotiable, and using the surplus to attack debt is exactly the right move. This is the kind of disciplined decision-making that gets you ahead.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Safe choice. Saving the whole amount keeps options open. The only risk is losing track of it — make sure rent money is clearly set aside.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'After a hard week, the urge to reward yourself is real — and not wrong in moderation. But with rent due in 10 days and existing debt, this week\'s extra income is needed for stability first.' }
+  },
+  s2: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Tough but smart. Tight grocery budgets hurt short-term, but keeping the phone active (for delivery work!) and avoiding credit card debt is the right priority.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Reasonable. Many providers allow short delays. Just make sure to follow through — delayed payments become missed payments if forgotten.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'Adding to the credit card balance for regular expenses makes the debt problem worse. It feels like a solution today but creates a bigger problem next month.' }
+  },
+  s3: {
+    best: { cls: 'sage', emoji: '🏆', text: 'This is how financial decisions should be made. Running the real numbers first prevents a common trap: agreeing to expenses based on optimistic "we\'ll cut back" assumptions that don\'t materialize.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Smart test. Proving you can actually save the amount before committing to it is a solid approach. It makes the decision evidence-based.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'When you currently break even, adding fixed expenses without a concrete and tested plan to cover them usually ends in more debt. Lifestyle upgrades are great — when the numbers genuinely support them.' }
+  },
+  s4: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Perfect. Canceling unused subscriptions AND redirecting that money to debt is the double win. $35/month extra on a $1,000 balance at 24% APR saves you over $400 in interest and cuts your payoff time nearly in half.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Reasonable compromise. Keeping one subscription you actually use is fine — the key is being intentional about it rather than forgetting you\'re paying for it.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'This is the trap: you freed up money but it evaporated into untracked spending. The savings only help if you redirect them intentionally. Free money needs a job.' }
+  },
+  s5: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Smart priority. Your car is literally how you earn money — neglecting it is false economy. A skipped oil change can lead to engine damage costing thousands. Maintaining your income source always comes first.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Reasonable triage. The oil change is the higher priority. Wiper blades matter for safety but can wait a short time more than overdue engine oil.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'Skipping car maintenance to save $85 while earning gig income is a high-risk move. A breakdown means zero income plus a big repair bill. On the credit card: this is exactly the kind of essential spending that a small emergency fund is designed to handle.' }
+  },
+  s6: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Honest and protective. Saying no to a loan when you genuinely can\'t afford it is not being a bad friend — it\'s being a responsible adult. A friend who truly cares about you won\'t want you to overdraft for them.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'A good middle ground — you\'re being honest about your limits while still trying to help where you safely can.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'Lending money you don\'t have is how one financial problem becomes two. An overdraft fee (if your bank charges one) plus a slow repayment turns a friend\'s $100 problem into your ongoing financial stress.' }
+  },
+  s7: {
+    best: { cls: 'sage', emoji: '🏆', text: 'Excellent balance. With only $150 in savings, you\'re one small emergency away from putting something on credit. Building savings and paying debt simultaneously is slow but creates resilience. Neither problem gets worse.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'Both single-focus approaches are defensible. All to debt saves the most in interest. All to savings builds the safety net faster. Either is better than spending it. The split is optimal but these work too.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'After 6 weeks of discipline, you absolutely deserve recognition — but a financial reward at this stage undoes real progress. Small treats are fine; using your surplus for them while carrying debt and no savings isn\'t the move right now.' }
+  },
+  s8: {
+    best: { cls: 'sage', emoji: '🏆', text: 'This is the right answer and it requires real courage. Money conversations with partners are uncomfortable — but agreeing to something that breaks your budget just to avoid the conversation creates resentment and financial stress later. Honest = healthy.' },
+    ok: { cls: 'gold', emoji: '👍', text: 'A reasonable starting point. Separating rent/utilities from groceries keeps it simpler and lets you test the joint account concept without overcommitting.' },
+    bad: { cls: 'coral', emoji: '⚠️', text: 'Agreeing to $600 when your budget can\'t support it is how good intentions become financial strain. Shared finances work when both people understand each other\'s real numbers — not when one person is quietly struggling to keep up.' }
+  }
+};
+
+// ===== TIPS DATA =====
+const tips = [
+  {
+    tag: 'Gig Income', color: 'peach',
+    title: 'Budget to your worst week, not your best',
+    preview: 'When income is unpredictable, always plan around the lowest realistic amount.',
+    body: 'Take your 3 slowest months of the past year. Average them. That\'s your budget baseline. Anything you earn above that is surplus — set it aside before spending. This keeps you safe in slow periods and helps you build savings in good ones.'
+  },
+  {
+    tag: 'Overdraft Prevention', color: 'sage',
+    title: 'Set a minimum balance floor',
+    preview: 'Pick a number — $150, $200 — and treat it as zero in your head.',
+    body: 'When your account hits your floor, you\'re "out of money" even if you technically have some. This gives you a buffer for automatic debits you forgot about, timing gaps between bills and income, and unexpected small expenses. Start at $100 if that\'s what\'s realistic right now. Raise it as your situation improves.'
+  },
+  {
+    tag: 'Credit Card Debt', color: 'coral',
+    title: 'Always pay more than the minimum',
+    preview: 'The minimum payment is designed to keep you in debt for years.',
+    body: 'Credit card companies profit from minimum payments. At 24% APR, a $1,500 balance paid at minimum rate takes over 8 years and nearly $1,500 in interest. Doubling the minimum payment cuts the time and interest by more than half. Even $20 extra per month makes a noticeable difference over time.'
+  },
+  {
+    tag: 'Automatic Debits', color: 'sky',
+    title: 'Audit your subscriptions every 3 months',
+    preview: 'Most people have 2–4 subscriptions they\'ve forgotten about.',
+    body: 'Set a reminder every 3 months to scan your bank or card statements for recurring charges. Cancel anything you haven\'t used in 30 days. Streaming services, apps, gym memberships, and free trials that converted to paid — they add up fast. Even $30–50/month recovered is $360–600/year that can go toward debt or savings.'
+  },
+  {
+    tag: 'Savings', color: 'sage',
+    title: 'Pay yourself first — before anything else',
+    preview: 'Savings happen when you move money before you spend it.',
+    body: 'If you wait until the end of the month to save "whatever\'s left," there\'s rarely anything left. Instead, move a fixed small amount immediately after you get paid — before any spending. Even $25 works. Set it aside in a separate spot (a savings account, an envelope, a different account) so it\'s mentally out of reach for regular spending.'
+  },
+  {
+    tag: 'Budgeting Basics', color: 'lavender',
+    title: 'Know your "fixed floor" every month',
+    preview: 'What\'s the minimum amount you need just to survive this month?',
+    body: 'Add up every expense that\'s truly non-negotiable: rent, utilities, phone, insurance, minimum debt payments. That total is your fixed floor. Everything you earn above the floor is where you have choices. Knowing this number changes how you think about income — it stops feeling abstract and starts feeling concrete.'
+  },
+  {
+    tag: 'Emergency Fund', color: 'peach',
+    title: 'Start with $500. Not $10,000.',
+    preview: 'A small emergency fund breaks the debt cycle more than people realize.',
+    body: '$500 in savings handles most everyday emergencies: a car repair, a medical copay, a slow work week. Without it, every emergency adds to debt. With it, you absorb the hit and move on without going backwards. Once you hit $500, aim for 1 month of expenses. Then 2. Build it slowly and consistently.'
+  },
+  {
+    tag: 'Mindset', color: 'coral',
+    title: 'Progress, not perfection',
+    preview: 'One bad week doesn\'t erase the habits you\'re building.',
+    body: 'Financial change is slow. You\'ll have weeks where you overspend, miss a savings goal, or make a choice you regret. That doesn\'t mean the work is wasted — it means you\'re human. What matters is the trend over months, not any single week. Keep coming back. Keep trying. The direction matters more than the speed.'
+  },
+  {
+    tag: 'Fixed Expenses', color: 'sky',
+    title: 'Keep fixed expenses under 60% of income',
+    preview: 'The higher your fixed costs as a percentage of income, the less room you have to breathe.',
+    body: 'Add up everything you\'re committed to paying regardless of your income: rent, phone, insurance, subscriptions, minimum debt payments. Divide by your baseline monthly income. If that number is over 60%, you have almost no margin for a slow week. Under 50% is the goal — it means $50 out of every $100 you earn is already yours to allocate intentionally.'
+  },
+  {
+    tag: 'Partner Finances', color: 'lavender',
+    title: 'Talk about money before it becomes a problem',
+    preview: 'Couples who discuss money openly have significantly less financial stress.',
+    body: 'You don\'t need to combine finances or know every detail of your partner\'s situation. But having a basic shared understanding of your household financial picture — what you each bring in, what the shared bills are, who pays what — prevents the most common sources of money-related conflict. Even a 15-minute conversation once a month about shared finances builds trust and prevents surprises.'
+  },
+];
+
+// ===== BADGES =====
+const badges = [
+  { id: 'b1', emoji: '🌱', name: 'First Step', condition: () => state.completedModules.size >= 1 },
+  { id: 'b2', emoji: '📚', name: 'Foundation', condition: () => ['l1m1','l1m2','l1m3'].every(id => state.completedModules.has(id)) },
+  { id: 'b3', emoji: '💳', name: 'Debt Aware', condition: () => state.completedModules.has('l1m4') },
+  { id: 'b4', emoji: '🧮', name: 'Tool User', condition: () => ['l2m1','l2m2','l2m3'].some(id => state.completedModules.has(id)) },
+  { id: 'b5', emoji: '🛡️', name: 'Safety Net', condition: () => state.completedModules.has('l3m1') },
+  { id: 'b6', emoji: '🏠', name: 'Home Aware', condition: () => state.completedModules.has('l3m4') },
+  { id: 'b7', emoji: '🎯', name: 'Decision Maker', condition: () => state.completedModules.has('l4m1') },
+  { id: 'b8', emoji: '🎲', name: 'Scenario Pro', condition: () => state.completedModules.has('l4m2') },
+  { id: 'b9', emoji: '🪞', name: 'Self-Aware', condition: () => state.completedModules.has('l5m1') },
+  { id: 'b10', emoji: '⭐', name: 'Star Student', condition: () => state.xp >= 400 },
+  { id: 'b11', emoji: '💰', name: 'Budget Builder', condition: () => state.completedModules.has('l2m3') },
+  { id: 'b12', emoji: '🏆', name: 'MoneyMind Pro', condition: () => state.completedModules.size >= modules.length },
+];
+
+// ===== QUIZ STATE =====
+let quizAnswered = false;
+
+// ===== FUNCTIONS =====
+function startApp() {
+  loadState();
+  if (!state.userName) {
+    // First time — show name prompt instead of going straight to app
+    showNamePrompt();
+    return;
+  }
+  launchApp();
+}
+
+function showNamePrompt() {
+  const splash = document.getElementById('splash');
+  splash.innerHTML = `
+    <div class="splash-logo">🧠</div>
+    <div class="splash-title">Welcome to MoneyMind</div>
+    <div class="splash-sub">Before we start — what should we call you?</div>
+    <input id="name-input" class="name-input" type="text" placeholder="Your first name" maxlength="30"
+      autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false">
+    <button class="splash-btn" onclick="saveName()" id="name-btn" style="opacity:0.4;pointer-events:none">Let\'s Begin →</button>
+    <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:12px">Your name stays on your device only</div>
+  `;
+  // Enable button once name is entered
+  const input = document.getElementById('name-input');
+  input.addEventListener('input', () => {
+    const btn = document.getElementById('name-btn');
+    const hasName = input.value.trim().length > 0;
+    btn.style.opacity = hasName ? '1' : '0.4';
+    btn.style.pointerEvents = hasName ? 'auto' : 'none';
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && input.value.trim().length > 0) saveName();
+  });
+  // Auto-focus after a short delay (splash animation)
+  setTimeout(() => input.focus(), 400);
+}
+
+function saveName() {
+  const input = document.getElementById('name-input');
+  const name = input.value.trim();
+  if (!name) return;
+  state.userName = name;
+  saveState();
+  launchApp();
+}
+
+function launchApp() {
+  document.getElementById('splash').classList.add('hidden');
+  const app = document.getElementById('app');
+  app.classList.add('visible');
+  document.getElementById('xp-display').textContent = state.xp;
+  renderHome();
+  renderTips();
+  updateProgress();
+}
+
+function isUnlocked(mod) {
+  if (!mod.unlockAfter) return true;
+  return state.completedModules.has(mod.unlockAfter);
+}
+
+function renderHome() {
+  const requiredEl = document.getElementById('required-modules');
+  const allEl = document.getElementById('all-modules');
+  requiredEl.innerHTML = '';
+  allEl.innerHTML = '';
+
+  // Update greeting with name
+  const nameEl = document.getElementById('greeting-name');
+  const msgEl = document.getElementById('greeting-msg');
+  if (nameEl) {
+    const allDone = state.completedModules.size === modules.length;
+    const justStarting = state.completedModules.size === 0;
+    nameEl.textContent = state.userName ? `Hey, ${state.userName}! 👋` : 'Welcome Back';
+    if (msgEl) {
+      if (allDone) msgEl.textContent = 'You\'ve completed every module. Incredible work!';
+      else if (justStarting) msgEl.textContent = 'Ready to start your financial journey?';
+      else msgEl.textContent = 'Ready to level up your money skills?';
+    }
+  }
+
+  const requiredMods = modules.filter(m => m.required);
+  requiredMods.forEach(mod => renderModuleCard(mod, requiredEl));
+
+  const nonRequired = modules.filter(m => !m.required);
+  nonRequired.forEach(mod => renderModuleCard(mod, allEl));
+}
+
+function renderModuleCard(mod, container) {
+  const done = state.completedModules.has(mod.id);
+  const unlocked = isUnlocked(mod);
+  const card = document.createElement('div');
+  card.className = `module-card ${done ? 'completed' : ''} ${!unlocked ? 'locked' : ''}`;
+
+  let badge = '';
+  let statusIcon = '';
+  if (done) { badge = '<span class="module-badge badge-done">✓ Done</span>'; statusIcon = '✅'; }
+  else if (!unlocked) { badge = '<span class="module-badge badge-locked">🔒 Locked</span>'; statusIcon = '🔒'; }
+  else if (mod.required) { badge = '<span class="module-badge badge-required">Required</span>'; statusIcon = '▶️'; }
+  else { badge = '<span class="module-badge badge-unlocked">Unlocked</span>'; statusIcon = '▶️'; }
+
+  // Compute layer-relative module position: "Module X of Y"
+  const layerMods = modules.filter(m => m.layer === mod.layer);
+  const modIndexInLayer = layerMods.findIndex(m => m.id === mod.id) + 1;
+  const modCountInLayer = layerMods.length;
+  const modLabel = `Module ${modIndexInLayer} of ${modCountInLayer}`;
+  const modLabelColor = unlocked ? '' : 'opacity:0.45;';
+
+  const layerColors = ['','var(--sage)','var(--sky)','var(--lavender)','var(--gold)','var(--coral)'];
+
+  card.innerHTML = `
+    <div class="module-icon ${mod.iconClass}">${mod.icon}</div>
+    <div class="module-info">
+      <div class="module-layer" style="color:${layerColors[mod.layer]}">
+        Layer ${mod.layer}: ${mod.layerName}
+        <span class="module-position" style="${modLabelColor}">· ${modLabel}</span>
+      </div>
+      <div class="module-title">${mod.title}</div>
+      <div class="module-desc">${mod.desc}</div>
+      <div class="module-meta">
+        <span class="module-time">⏱ ${mod.time}</span>
+        <span class="module-time">⭐ +${mod.xp} XP</span>
+        ${badge}
+      </div>
+    </div>
+    <div class="module-status">${statusIcon}</div>
+  `;
+
+  if (unlocked) {
+    card.onclick = () => openLesson(mod);
+  }
+  container.appendChild(card);
+}
+
+function openLesson(mod) {
+  state.currentModule = mod;
+  state.currentStep = 0;
+  quizAnswered = false;
+  showScreen('lesson');
+  renderLessonStep();
+}
+
+function renderLessonStep() {
+  const mod = state.currentModule;
+  const step = mod.steps[state.currentStep];
+  const isLast = state.currentStep === mod.steps.length - 1;
+  const contentFn = lessonContent[mod.id]?.[step];
+  
+  const progress = ((state.currentStep) / (mod.steps.length - 1)) * 100;
+  
+  let stepHTML = '';
+  if (step === 'complete') {
+    stepHTML = `
+      <div class="lesson-card" style="text-align:center;padding:40px 24px">
+        <div style="font-size:64px;margin-bottom:16px">🎉</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text-dark);margin-bottom:8px">Module Complete!</div>
+        <div style="font-family:'Lora',serif;font-style:italic;color:var(--text-mid);margin-bottom:4px">${mod.title}</div>
+        <div style="font-size:28px;font-weight:900;color:var(--peach-dark);margin-top:12px">+${mod.xp} XP earned</div>
+      </div>
+    `;
+  } else if (contentFn) {
+    stepHTML = contentFn();
+  }
+
+  const btnText = step === 'complete' ? 'Back to Home' : isLast ? 'Complete Module' : 'Continue →';
+  const btnClass = step === 'complete' || isLast ? 'complete-btn' : '';
+
+  document.getElementById('lesson-content').innerHTML = `
+    <div class="lesson-header">
+      <button class="lesson-back" onclick="showScreen('home')">← Back to Modules</button>
+      <div class="lesson-layer-tag" style="background:${getLayerBg(mod.layer)};color:${getLayerColor(mod.layer)}">
+        Layer ${mod.layer}: ${mod.layerName}
+      </div>
+      <div class="lesson-title">${mod.title}</div>
+      <div class="lesson-subtitle">Step ${state.currentStep + 1} of ${mod.steps.length}</div>
+      <div class="lesson-progress-bar">
+        <div class="lesson-progress-fill" style="width:${progress}%"></div>
+      </div>
+    </div>
+    ${stepHTML}
+    <button class="continue-btn ${btnClass}" onclick="nextStep()" id="continue-btn">${btnText}</button>
+  `;
+  document.getElementById('lesson-footer').innerHTML = '';
+  window.scrollTo(0, 0);
+}
+
+function getLayerBg(l) {
+  const bgs = ['','#e8f5e9','#e3f2fd','#f3e5f5','#fffde7','#fce4ec'];
+  return bgs[l] || '#f0f0f0';
+}
+function getLayerColor(l) {
+  const cs = ['','var(--sage-dark)','var(--sky)','var(--lavender)','#b8960c','var(--coral)'];
+  return cs[l] || '#666';
+}
+
+function nextStep() {
+  const mod = state.currentModule;
+  const step = mod.steps[state.currentStep];
+
+  // Already on completion card — just go home
+  if (step === 'complete') {
+    showScreen('home');
+    return;
+  }
+
+  // Check if the next step is 'complete' — trigger module completion
+  const nextStepIndex = state.currentStep + 1;
+  if (nextStepIndex < mod.steps.length && mod.steps[nextStepIndex] === 'complete') {
+    completeModule();
+    return;
+  }
+
+  // Normal: advance to next step
+  if (state.currentStep < mod.steps.length - 1) {
+    state.currentStep++;
+    quizAnswered = false;
+    renderLessonStep();
+  } else {
+    completeModule();
+  }
+}
+
+function completeModule() {
+  const mod = state.currentModule;
+  if (!state.completedModules.has(mod.id)) {
+    state.completedModules.add(mod.id);
+    state.xp += mod.xp;
+    document.getElementById('xp-display').textContent = state.xp;
+    saveState();
+    showCompletionModal(mod);
+  } else {
+    showScreen('home');
+  }
+  updateProgress();
+  renderHome();
+}
+
+function showCompletionModal(mod) {
+  document.getElementById('modal-emoji').textContent = mod.icon;
+  document.getElementById('modal-title').textContent = 'Module Complete!';
+  document.getElementById('modal-sub').textContent = mod.title;
+  document.getElementById('modal-xp').textContent = `+${mod.xp} XP`;
+  document.getElementById('completion-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('completion-modal').classList.remove('show');
+  showScreen('home');
+}
+
+function answerQuiz(btn, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const allBtns = btn.parentElement.querySelectorAll('.quiz-option');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  const feedback = document.getElementById('quiz-feedback');
+  if (feedback) {
+    feedback.classList.add('show', correct ? 'correct' : 'wrong');
+    if (!correct) {
+      feedback.textContent = '❌ Not quite. Think about what happens when a small monthly gap compounds over time. Try reviewing the lesson above.';
+      allBtns.forEach(b => { if (b.dataset.correct) b.classList.add('correct'); });
+    }
+  }
+}
+
+function answerScenario(btn, quality, id) {
+  const allBtns = btn.parentElement.querySelectorAll('.scenario-option');
+  allBtns.forEach(b => b.style.pointerEvents = 'none');
+  const classMap = { best: 'selected-best', ok: 'selected-ok', bad: 'selected-bad' };
+  btn.classList.add(classMap[quality]);
+  const fb = scenarioFeedback[id]?.[quality];
+  const result = document.getElementById(`${id}-result`);
+  if (result && fb) {
+    const bgMap = { sage: '#e8f5e9', gold: '#fffde7', coral: '#fce4ec' };
+    const colorMap = { sage: 'var(--sage-dark)', gold: '#856404', coral: '#c0392b' };
+    result.style.background = bgMap[fb.cls] || '#f0f0f0';
+    result.style.color = colorMap[fb.cls] || '#333';
+    result.innerHTML = `<strong>${fb.emoji}</strong> ${fb.text}`;
+    result.classList.add('show');
+  }
+}
+
+function answerCheckin(btn, answer, id) {
+  const siblings = btn.parentElement.querySelectorAll('.checkin-btn');
+  siblings.forEach(b => { b.style.pointerEvents = 'none'; b.classList.remove('selected'); });
+  btn.classList.add('selected', answer);
+  const res = checkinResponses[id]?.[answer];
+  const el = document.getElementById(`${id}-response`);
+  if (el && res) {
+    el.style.background = res.bg;
+    el.style.color = res.color;
+    el.textContent = res.text;
+    el.classList.add('show');
+  }
+}
+
+function calcDebt() {
+  const balance = parseFloat(document.getElementById('calc-balance').value) || 0;
+  const apr = parseFloat(document.getElementById('calc-apr').value) || 0;
+  const payment = parseFloat(document.getElementById('calc-payment').value) || 0;
+  if (balance <= 0 || apr <= 0 || payment <= 0) return;
+  
+  const monthlyRate = apr / 100 / 12;
+  let remaining = balance;
+  let months = 0;
+  let totalInterest = 0;
+  
+  while (remaining > 0 && months < 600) {
+    const interest = remaining * monthlyRate;
+    totalInterest += interest;
+    remaining = remaining + interest - payment;
+    months++;
+    if (remaining < 0) remaining = 0;
+  }
+  
+  const result = document.getElementById('debt-result');
+  document.getElementById('debt-months').textContent = months >= 600 ? 'Never (increase payment!)' : `${months} months`;
+  document.getElementById('debt-note').textContent = months < 600
+    ? `You'll pay $${totalInterest.toFixed(0)} in interest. Total paid: $${(balance + totalInterest).toFixed(0)}. Payoff: ${Math.floor(months/12)} yr ${months%12} mo.`
+    : 'Your payment doesn\'t cover the monthly interest. Increase your payment amount.';
+  result.classList.add('show');
+}
+
+function calcBuffer() {
+  const fixed = parseFloat(document.getElementById('calc-fixed').value) || 0;
+  const slow = parseFloat(document.getElementById('calc-slow').value) || 0;
+  const avg = parseFloat(document.getElementById('calc-avg').value) || 0;
+  if (fixed <= 0 || slow <= 0) return;
+  
+  const gap = fixed - slow;
+  const recommended = Math.max(fixed * 0.5, gap > 0 ? gap * 1.5 : fixed * 0.25);
+  const result = document.getElementById('buffer-result');
+  document.getElementById('buffer-amount').textContent = `$${Math.round(recommended)}`;
+  document.getElementById('buffer-note').textContent = gap > 0
+    ? `Your slow month income ($${slow}) doesn't cover expenses ($${fixed}). You need a buffer of at least $${Math.round(gap)} plus a safety margin. Build this up in good weeks.`
+    : `Your slow income covers expenses with $${slow - fixed}/mo to spare. Still keep $${Math.round(recommended)} as a cushion for timing gaps and unexpected costs.`;
+  result.classList.add('show');
+}
+
+function calcBudget() {
+  const income = parseFloat(document.getElementById('bud-income')?.value) || 0;
+  const rent = parseFloat(document.getElementById('bud-rent')?.value) || 0;
+  const phone = parseFloat(document.getElementById('bud-phone')?.value) || 0;
+  const utilities = parseFloat(document.getElementById('bud-utilities')?.value) || 0;
+  const debt = parseFloat(document.getElementById('bud-debt')?.value) || 0;
+  const groceries = parseFloat(document.getElementById('bud-groceries')?.value) || 0;
+  const gas = parseFloat(document.getElementById('bud-gas')?.value) || 0;
+  const fun = parseFloat(document.getElementById('bud-fun')?.value) || 0;
+  const subs = parseFloat(document.getElementById('bud-subs')?.value) || 0;
+  const misc = parseFloat(document.getElementById('bud-misc')?.value) || 0;
+
+  const totalExpenses = rent + phone + utilities + debt + groceries + gas + fun + subs + misc;
+  const surplus = income - totalExpenses;
+
+  const incomeEl = document.getElementById('bud-total-income');
+  const expEl = document.getElementById('bud-total-expenses');
+  const surplusEl = document.getElementById('bud-surplus');
+  const adviceEl = document.getElementById('bud-advice');
+  const resultEl = document.getElementById('budget-result');
+
+  if (incomeEl) incomeEl.textContent = `$${income.toFixed(0)}`;
+  if (expEl) expEl.textContent = `$${totalExpenses.toFixed(0)}`;
+  if (surplusEl) surplusEl.textContent = `${surplus >= 0 ? '+' : ''}$${surplus.toFixed(0)}`;
+
+  let advice = '';
+  let bg = '';
+  if (income === 0) {
+    advice = 'Enter your monthly income above to see your budget picture.';
+    bg = 'linear-gradient(135deg, var(--sage) 0%, var(--sage-dark) 100%)';
+  } else if (surplus > 100) {
+    advice = `You have $${surplus.toFixed(0)} left over each month. Consider splitting this between extra debt payments and savings to build momentum on both fronts.`;
+    bg = 'linear-gradient(135deg, #43a047, #2e7d32)';
+  } else if (surplus >= 0) {
+    advice = `You're breaking even with $${surplus.toFixed(0)} to spare. That's a starting point — look at variable expenses (eating out, subscriptions, misc) for room to find an extra $50–100/month.`;
+    bg = 'linear-gradient(135deg, #f9a825, #f57f17)';
+  } else {
+    advice = `You're $${Math.abs(surplus).toFixed(0)} short each month. This gap needs to close — look first at variable expenses you can reduce, then at whether any fixed costs can be eliminated.`;
+    bg = 'linear-gradient(135deg, #e53935, #b71c1c)';
+  }
+
+  if (adviceEl) adviceEl.textContent = advice;
+  if (resultEl) resultEl.style.background = bg;
+}
+
+function updateProgress() {
+  const total = modules.length;
+  const done = state.completedModules.size;
+  const pct = Math.round((done / total) * 100);
+  
+  document.getElementById('overall-progress').style.width = pct + '%';
+  document.getElementById('modules-done').textContent = `${done} modules done`;
+  document.getElementById('modules-total').textContent = `· ${total} total`;
+  document.getElementById('stat-xp').textContent = state.xp;
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('stat-streak').textContent = state.streak + '🔥';
+  document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('xp-display').textContent = state.xp;
+
+  // Layer progress
+  for (let l = 1; l <= 5; l++) {
+    const layerMods = modules.filter(m => m.layer === l);
+    const layerDone = layerMods.filter(m => state.completedModules.has(m.id)).length;
+    const layerPct = layerMods.length > 0 ? Math.round((layerDone / layerMods.length) * 100) : 0;
+    const bar = document.getElementById(`l${l}-bar`);
+    const pctEl = document.getElementById(`l${l}-pct`);
+    if (bar) bar.style.width = layerPct + '%';
+    if (pctEl) pctEl.textContent = layerPct + '%';
+  }
+
+  // Badges
+  renderBadges();
+}
+
+function renderBadges() {
+  const grid = document.getElementById('badge-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  badges.forEach(b => {
+    const earned = b.condition();
+    const item = document.createElement('div');
+    item.className = `badge-item ${earned ? 'earned' : ''}`;
+    item.innerHTML = `
+      <div class="badge-emoji ${earned ? '' : 'badge-locked-overlay'}">${b.emoji}</div>
+      <div class="badge-name">${b.name}</div>
+    `;
+    grid.appendChild(item);
+  });
+}
+
+function renderTips() {
+  const list = document.getElementById('tips-list');
+  list.innerHTML = '';
+  tips.forEach((tip, i) => {
+    const card = document.createElement('div');
+    card.className = `tip-card ${tip.color}`;
+    card.innerHTML = `
+      <div class="tip-tag">${tip.tag}</div>
+      <div class="tip-title">${tip.title}</div>
+      <div class="tip-preview">${tip.preview}</div>
+      <div class="tip-body" id="tip-body-${i}">${tip.body}</div>
+    `;
+    card.onclick = () => {
+      const body = document.getElementById(`tip-body-${i}`);
+      body.classList.toggle('open');
+    };
+    list.appendChild(card);
+  });
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`screen-${name}`)?.classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  if (name === 'progress') updateProgress();
+  if (name === 'home') renderHome();
+  if (name !== 'lesson') window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
