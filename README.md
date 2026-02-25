@@ -1,40 +1,87 @@
 # MoneyMind-Personal-Finance-Teacher
 MoneyMind Personal Finance Teacher App
-# MoneyMind v1.3 — Release Notes
+# MoneyMind v1.3.1 — Release Notes
 
-## What's New in v1.3
+## What's New in v1.3.1
 
-### 🏷️ Layer + Module Labels on Every Card
-Each module card now shows its position within its layer — e.g. **"Layer 1: Foundation · Module 2 of 4"**. This gives a clear sense of where you are and how much is left within each layer without overwhelming the user with a global count. Locked modules show the label at reduced opacity so the structure is visible but not distracting.
+### 🖱️ Quiz Button Clickability Fix
+Fixed a critical bug where the fourth quiz answer button did not respond to clicks in the center of the button. This affected all 12 quiz modules and was particularly noticeable on mobile devices where touch targets are more sensitive.
 
-### 👋 Name Personalization
-On first launch, MoneyMind asks "What should we call you?" before entering the app. The name is stored locally on the device and used to personalize the home screen greeting ("Hey, Marcus! 👋"). The greeting message also adapts based on progress — different text for just starting, in progress, and fully complete. A **✏️ Change Name** button in the progress screen lets users update it any time.
+**Root causes identified:**
+- Missing text selection prevention (`user-select: none`)
+- Insufficient spacing between quiz cards and Continue button (16px → 32px)
+- No touch optimization for mobile devices (`touch-action: manipulation`)
+- Inconsistent button sizing and line-height
 
-### 🔢 Dynamic Module Count
-The "X total" count on the home screen progress bar is now pulled from the live modules array instead of being hardcoded. Stays accurate as content is added in future versions.
+**Solutions implemented:**
+- Added text selection prevention across all browsers
+- Doubled spacing: quiz card bottom margin (16px → 32px) and Continue button top margin (16px → 32px)
+- Optimized for touch devices with `touch-action: manipulation`
+- Ensured consistent button sizing with `width: 100%`, `display: block`, and `line-height: 1.4`
 
-### ❌ Wrong Answer Explanations
-When a quiz question is answered incorrectly, the app now:
-- Highlights the selected wrong answer in red
-- Highlights the correct answer in green
-- Shows a question-specific explanation naming the correct answer and the reasoning behind it
-
-Every one of the 12 quiz questions has its own tailored wrong-answer explanation — not a generic message. For example, getting Q1 wrong shows: *"❌ Not quite — the answer is $1,200. You're spending $200 more than you earn each month ($1,700 - $1,500). Over 6 months that adds up to $200 × 6 = $1,200 in debt. Small monthly gaps compound fast."*
+**Total spacing improvement:** 48px between quiz options and Continue button prevents any touch target overlap.
 
 ---
 
 ## Bug Fixes
 
-- **Unlock chain fixed** — completing a module now correctly marks it done and unlocks the next. Root cause: `nextStep()` never called `completeModule()` because the `'complete'` step was the last array entry, not a trigger for completion logic.
-- **Continue button restored** — button is back inside the scrollable lesson content (reliable across all browsers). iOS bounce handled with `overscroll-behavior: none` on html/body.
-- **Quiz answer corrected** — coffee spending question updated from "every weekday / $1,300" to "every day / $1,825" (more impactful number, unambiguous wording).
-- **JavaScript syntax error fixed** — unescaped apostrophes in checkin response strings (c4–c6) were silently breaking the entire script, preventing the Let's Begin button from working.
-- **Module count display** — was hardcoded to "13 total"; now dynamic.
-- **Font contrast fixes** — name input on splash screen was white text on a near-white background (now white input with dark text and sage border). Module layer/position labels were too faint on white cards (bumped to readable contrast; locked cards remain dimmed).
+### Quiz Button Clickability (CRITICAL)
+**Issue:** Fourth quiz answer button did not allow selection in the middle of the button. Edges worked, but center/middle clicks were ignored.
+
+**Affected modules:** All 12 quiz questions across L1M2, L2M1, L3M1, L3M2, L3M4, L4M1, L4M2
+
+**Investigation findings:**
+- Text selection interference: clicking button text triggered browser text selection instead of button click
+- Touch target overlap: Continue button's 16px top margin caused interference on mobile
+- Mobile optimization missing: no `touch-action` property set
+- Inconsistent button dimensions: multi-line button text created dead zones
+
+**High-risk buttons** (long text, most likely to wrap on mobile):
+- Q3: "Pay only the current month's bills with it" (42 chars)
+- Q5: "Nothing if you have Ally's CoverDraft" (37 chars)
+- Q8: "It doesn't matter — both strategies are identical" (51 chars)
+- Q11: "You skip fixing it and it resolves itself" (41 chars)
+
+**CSS changes made:**
+
+```css
+/* Quiz card spacing - doubled */
+.quiz-card {
+  margin-bottom: 32px; /* was 16px */
+}
+
+/* Quiz button improvements */
+.quiz-option {
+  width: 100%;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  touch-action: manipulation;
+  line-height: 1.4;
+}
+
+/* Continue button spacing - doubled */
+#lesson-footer .continue-btn {
+  margin-top: 32px; /* was 16px */
+}
+```
+
+**Version metadata changes:**
+- Title: "MoneyMind v1.3.1 — Your Financial Journey"
+- Meta version: 1.3.1
+- Comment: "MoneyMind v1.3.1 - Fixed quiz button clickability"
+
+**Total lines changed:** 5 sections, ~15 lines of code  
+**Type of changes:** CSS improvements only  
+**Breaking changes:** None  
+**Data migration needed:** None  
+**localStorage compatibility:** Fully compatible with v1.3
 
 ---
 
-## Content (unchanged from v1.2)
+## Content (unchanged from v1.3)
 
 | Layer | Name | Modules | XP |
 |-------|------|---------|-----|
@@ -45,6 +92,12 @@ Every one of the 12 quiz questions has its own tailored wrong-answer explanation
 | 5 | Reflection | 1 | 60 |
 | **Total** | | **14 modules** | **945 XP** |
 
+All features from v1.3 remain unchanged:
+- 🏷️ Layer + Module labels on every card
+- 👋 Name personalization with greeting
+- 🔢 Dynamic module count
+- ❌ Wrong answer explanations (all 12 quizzes)
+
 ---
 
 ## Version History
@@ -54,14 +107,77 @@ Every one of the 12 quiz questions has its own tailored wrong-answer explanation
 | v1.0 | Initial release — 10 modules, 5 layers, badges, tips |
 | v1.1 | localStorage persistence, streak tracking, reset button |
 | v1.2 | 14 modules, expanded Layer 1 depth, new Layer 2/3/4/5 content, scenario doubling |
-| **v1.3** | **Name personalization, layer+module labels, wrong-answer explanations, bug fixes** |
+| v1.3 | Name personalization, layer+module labels, wrong-answer explanations, bug fixes |
+| **v1.3.1** | **Quiz button clickability fix (CSS improvements for touch targets)** |
+
+---
+
+## Upgrade Path
+
+### From v1.3 to v1.3.1
+1. Download `MoneyMind_v1_3_1.html`
+2. Replace the old file
+3. No data migration needed - localStorage is fully compatible
+
+### Testing After Upgrade
+1. Open the app — your progress should be intact
+2. Navigate to any quiz module (L1M2, L2M1, L3M1, L3M2, L3M4, L4M1, L4M2)
+3. Test clicking all 4 quiz answer buttons, especially the 4th one
+4. Try clicking at different positions: left, center, right, top, bottom
+5. Verify Continue button appears with appropriate spacing (no overlap)
+
+**Recommendation:** All v1.3 users should upgrade to v1.3.1 to benefit from improved button responsiveness, especially on mobile devices.
+
+---
+
+## Technical Details
+
+### Visual Spacing Comparison
+
+**Before (v1.3):**
+```
+[Quiz Card]
+  Question?
+  [ Option 1 ]
+  [ Option 2 ]
+  [ Option 3 ]
+  [ Option 4 ] ← 16px spacing
+                ← potential overlap zone
+[ Continue → ]
+```
+
+**After (v1.3.1):**
+```
+[Quiz Card]
+  Question?
+  [ Option 1 ]
+  [ Option 2 ]
+  [ Option 3 ]
+  [ Option 4 ] ← 32px spacing
+                ← safe zone
+                ← 32px spacing
+[ Continue → ]
+```
+
+### What Didn't Change
+
+✅ Lesson content  
+✅ Quiz questions and answers  
+✅ Module structure  
+✅ XP values  
+✅ Badge system  
+✅ Progress tracking  
+✅ localStorage format  
+✅ JavaScript logic  
+✅ Color scheme  
+✅ Typography  
+✅ Navigation  
 
 ---
 
 ## Roadmap
 
 ### v1.4 — Content Expansion
-- Show correct answer + explanation on wrong quiz selection *(completed in v1.3)*
 - Layer 3: Understanding Taxes for Gig Workers
 - Layer 3: Building Credit from Scratch
 - Layer 4: Part 3 scenarios (longer-term decisions)
